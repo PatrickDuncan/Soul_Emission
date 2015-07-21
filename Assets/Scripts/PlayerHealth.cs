@@ -9,13 +9,13 @@ public class PlayerHealth : MonoBehaviour {
 	[HideInInspector]
 	public bool isDead = false;					// If the player is dead
 
-	private PlayerControl playerControl;		// Reference to the PlayerControl script.
+	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;						// Reference to the Animator on the player
 
 	private object[,] reset;
 
 	private void Awake () {
-		playerControl = GetComponent<PlayerControl>();
+		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
 		currentH = health;
 		loadReset();
@@ -32,7 +32,7 @@ public class PlayerHealth : MonoBehaviour {
 			isDead = true;
 			anim.SetTrigger("DeathRight");
 			GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-			playerControl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
+			playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
 			StartCoroutine(Revive());
 		}
 	}
@@ -51,8 +51,8 @@ public class PlayerHealth : MonoBehaviour {
 	private void ResetPositions () {
     	transform.position = (Vector3)reset[0, 0];
     	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-    	playerControl.isRight = (bool)reset[0, 1];;
-    	playerControl.resetHelmet();
+    	playerCtrl.isRight = (bool)reset[0, 1];;
+    	playerCtrl.resetHelmet();
     	GameObject.FindGameObjectWithTag("PointyLegs1").transform.position = (Vector3)reset[1, 0];
     	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().isRight = (bool)reset[1, 1];
     	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().health = 45f;

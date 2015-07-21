@@ -3,14 +3,14 @@ using System.Collections;
 
 public class PointyLegs : MonoBehaviour {
 
-	public bool isRight = false;
+	public bool isRight = false;			// For determining which way the pointy legs is currently facing.	
 	private bool allowedToAttack = true;
 	private bool allowedToStairs = true;
 	public bool attacking = false;
+	public bool inStairs = false;			// If interacting with the stairs in any way.
 	public float moveForce = 365f;			// Amount of force added to move the player left and right.
 	public float maxSpeed = 1f;				// The fastest the player can travel in the x axis.
 	public float health = 45f;
-	private float damageAmount = 10f;
 	private Vector2 center;
 	private Vector2 playerPos;
 
@@ -19,7 +19,7 @@ public class PointyLegs : MonoBehaviour {
 	private Rigidbody2D rb;
 	private PlayerHealth playerH;
 
-	void Awake() {
+	void Awake () {
 		anim = transform.root.gameObject.GetComponent<Animator>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		rb = GetComponent<Rigidbody2D>();
@@ -49,44 +49,45 @@ public class PointyLegs : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D (Collision2D col) {
-		for (int i=1; i<10; i++) {
-			try {
-				if (col.gameObject.tag == "Stairs"+i && !GameObject.FindGameObjectWithTag("Stairs"+i).GetComponent<PolygonCollider2D>().isTrigger && allowedToStairs) {
-					if (isRight) {
-						transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 34f, 0f));
-						rb.centerOfMass = new Vector2(center.x - 1.7f, center.y - 0.3f);
-					}
-					else {
-						transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 326f, 361f));
-						rb.centerOfMass = new Vector2(center.x + 0.1f, center.y - 0.3f);
-					}
-					rb.constraints = RigidbodyConstraints2D.None;
-					rb.mass = 27f;		//Allows the enemy to move up the staris quicker
-					break;		//Can only collide with one stair at a time
-				}
+		string tag = col.gameObject.tag;
+		if (tag.Contains("Stairs") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger && allowedToStairs) {
+			if (isRight) {
+				transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 34f, 0f));
+				rb.centerOfMass = new Vector2(center.x - 1.7f, center.y - 0.3f);
 			}
-			catch (UnityEngine.UnityException) {
-				break;
+			else {
+				transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 326f, 361f));
+				rb.centerOfMass = new Vector2(center.x + 0.1f, center.y - 0.3f);
 			}
-		}
+			rb.constraints = RigidbodyConstraints2D.None;
+			rb.mass = 27f;			//Allows the enemy to move up the staris quicker
+			inStairs = true;
+		}	
+		if (tag == "Fire")
+			TakeDamage(1000f);		//Instantly die if you touch fire	
+	}
+
+	private void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = true;	
 	}
 
 	void OnCollisionExit2D (Collision2D col) {
-		for (int i=1; i<10; i++) {
-			try {
-				if (col.gameObject.tag == "Stairs"+i && !GameObject.FindGameObjectWithTag("Stairs"+i).GetComponent<PolygonCollider2D>().isTrigger) {
-					transform.localEulerAngles = new Vector3(0f,0f,0f);
-					rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-					rb.mass = 40f;
-					StartCoroutine(WaitForStairs());
-					break;
-				}
-			}
-			catch (UnityEngine.UnityException) {
-				break;
-			}
+		string tag = col.gameObject.tag;
+		if (tag.Contains("Stairs") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger) {
+			transform.localEulerAngles = new Vector3(0f ,0f, 0f);
+			rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+			rb.mass = 40f;
+			StartCoroutine(WaitForStairs());
+			inStairs = false;
 		}
 	}
+
+	private void OnTriggerExit2D (Collider2D col) {
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = false;
+	}
+
 
 	void Move () {
 		float h;
@@ -109,7 +110,7 @@ public class PointyLegs : MonoBehaviour {
 		transform.localScale = theScale;
 	}
 
-	public void TakeDamage () {
+	public void TakeDamage (float damageAmount) {
 		health -= damageAmount;
 		//When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {

@@ -3,17 +3,18 @@ using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
 	[HideInInspector]
-	public bool isRight = true;			// For determining which way the player is currently facing.
+	public bool isRight = true;				// For determining which way the player is currently facing.
+	public bool inStairs = false;			// If interacting with the stairs in any way.
 	public float moveForce = 365f;			// Amount of force added to move the player left and right.
 	public float maxSpeed = 5f;				// The fastest the player can travel in the x axis.
-	public Quaternion defaultLight;			//Default position of the helmet light
+	public Quaternion defaultLight;			// Default position of the helmet light
 
 	private Animator anim;					
 	public Transform helmet;
 	public Quaternion rotation;
 	private PlayerHealth playerH;
 
-	private void Awake() {
+	private void Awake () {
 		helmet = GameObject.FindGameObjectWithTag("Helmetlight").transform;
 		anim = GetComponent<Animator>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
@@ -54,10 +55,26 @@ public class PlayerControl : MonoBehaviour {
 	    }
 	}
 
-	private void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Fire") {
+	private void OnCollisionEnter2D (Collision2D col) {
+		if (col.gameObject.tag == "Fire")
 			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
-		}
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = true;
+	}
+
+	private void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = true;	
+	}
+
+	private void OnCollisionExit2D (Collision2D col) {
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = false;
+	}
+
+	private void OnTriggerExit2D (Collider2D col) {
+		if (col.gameObject.tag.Contains("Stairs"))
+			inStairs = false;
 	}
 
 	private void Flip () {

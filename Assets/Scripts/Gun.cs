@@ -14,7 +14,7 @@ public class Gun : MonoBehaviour {
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;
 
-	private void Awake() {
+	private void Awake () {
 		anim = transform.root.gameObject.GetComponent<Animator>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
@@ -43,7 +43,7 @@ public class Gun : MonoBehaviour {
 	}
 
 	//You just shot the gun, wait to shoot again.
-	private IEnumerator Wait() {
+	private IEnumerator Wait () {
         allowedToShoot = false;
         yield return new WaitForSeconds(0.8f);
         allowedToShoot = true;
