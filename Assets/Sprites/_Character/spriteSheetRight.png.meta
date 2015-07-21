@@ -1,0 +1,176 @@
+fileFormatVersion: 2
+guid: 67652e58e866bc442965eca4b8b0b5b9
+timeCreated: 1436951426
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: spritesheetright_0
+    21300002: spritesheetright_1
+    21300004: spritesheetright_2
+    21300006: spritesheetright_3
+    21300008: spritesheetright_4
+    21300010: spritesheetright_5
+    21300012: spritesheetright_6
+    21300014: spritesheetright_7
+    21300016: spritesheetright_8
+    21300018: spritesheetright_9
+    21300020: spritesheetright_10
+    21300022: spritesheetright_11
+    21300024: spritesheetright_12
+    21300026: spritesheetright_13
+    21300028: spritesheetright_14
+    21300030: spritesheetright_15
+    21300032: spritesheetright_16
+    21300034: spritesheetright_17
+    21300036: spritesheetright_18
+    21300038: spritesheetright_19
+    21300040: spritesheetright_20
+    21300042: spritesheetright_21
+    21300044: spritesheetright_22
+    21300046: spritesheetright_23
+    21300048: spritesheetright_24
+    21300050: spritesheetright_25
+    21300052: spritesheetright_26
+    21300054: spritesheetright_27
+    21300056: spritesheetright_28
+    21300058: spritesheetright_29
+    21300060: spritesheetright_30
+    21300062: spritesheetright_31
+    21300064: spritesheetright_32
+    21300066: spritesheetright_33
+    21300068: spritesheetright_34
+    21300070: spritesheetright_35
+    21300072: spritesheetright_36
+    21300074: spritesheetright_37
+    21300076: spritesheetright_38
+    21300078: spritesheetright_39
+    21300080: spritesheetright_40
+    21300082: spritesheetright_41
+    21300084: spritesheetright_42
+    21300086: spritesheetright_43
+    21300088: spritesheetright_44
+    21300090: spritesheetright_45
+    21300092: spritesheetright_46
+    21300094: spritesheetright_47
+    21300096: spritesheetright_48
+    21300098: spritesheetright_49
+    21300100: spritesheetright_50
+    21300102: spritesheetright_51
+    21300104: spritesheetright_52
+    21300106: spritesheetright_53
+    21300108: spritesheetright_54
+    21300110: spritesheetright_55
+    21300112: spritesheetright_56
+    21300114: spritesheetright_57
+    21300116: spritesheetright_58
+    21300118: spritesheetright_59
+    21300120: spritesheetright_60
+    21300122: spritesheetright_61
+    21300124: spritesheetright_62
+    21300126: spritesheetright_63
+    21300128: spritesheetright_64
+    21300130: spritesheetright_65
+    21300132: spritesheetright_66
+    21300134: spritesheetright_67
+    21300136: spritesheetright_68
+    21300138: spritesheetright_69
+    21300140: spritesheetright_70
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: spritesheetright_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 251
+        height: 500
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: spritesheetright_1
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 0
+        width: 251
+        height: 500
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: spritesheetright_2
+      rect:
+        serializedVersion: 2
+        x: 584
+        y: 0
+        width: 251
+        height: 500
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: spritesheetright_3
+      rect:
+        serializedVersion: 2
+        x: 870
+        y: 0
+        width: 251
+        height: 500
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: spritesheetright_4
+      rect:
+        serializedVersion: 2
+        x: 1151
+        y: 0
+        width: 251
+        height: 500
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
