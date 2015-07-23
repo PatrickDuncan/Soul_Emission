@@ -7,7 +7,7 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;
 	private bool allowedToStairs = true;
 	public bool attacking = false;
-	public bool inStairs = false;			// If interacting with the stairs in any way.
+	public string stairsTag = "none";			// If interacting with the stairs in any way.
 	public float moveForce = 365f;			// Amount of force added to move the player left and right.
 	public float maxSpeed = 1f;				// The fastest the player can travel in the x axis.
 	public float health = 45f;
@@ -51,43 +51,52 @@ public class PointyLegs : MonoBehaviour {
 	void OnCollisionEnter2D (Collision2D col) {
 		string tag = col.gameObject.tag;
 		if (tag.Contains("Stairs") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger && allowedToStairs) {
-			if (isRight) {
-				transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 34f, 0f));
-				rb.centerOfMass = new Vector2(center.x - 1.7f, center.y - 0.3f);
-			}
-			else {
-				transform.localEulerAngles = new Vector3(0f, 0f, Mathf.Clamp(transform.localEulerAngles.z, 326f, 361f));
-				rb.centerOfMass = new Vector2(center.x + 0.1f, center.y - 0.3f);
-			}
-			rb.constraints = RigidbodyConstraints2D.None;
-			rb.mass = 27f;			//Allows the enemy to move up the staris quicker
-			inStairs = true;
-		}	
+		 	if (GameObject.FindGameObjectWithTag(tag).transform.position.y - transform.position.y > 0) {
+		 		if (isRight) {
+		 			rb.centerOfMass = new Vector2(center.x - 2f, center.y - 0.3f);
+		 		}
+		 		else {
+		 			rb.centerOfMass = new Vector2(center.x + 0.5f, center.y - 0.3f);
+		 		}
+		 	}
+		 	else if (GameObject.FindGameObjectWithTag(tag).transform.position.y - transform.position.y < 0) {
+		 		if (isRight) {
+		 			rb.centerOfMass = new Vector2(center.x - 1f, center.y);
+		 		}
+		 		else {
+		 			rb.centerOfMass = new Vector2(center.x + 1f, center.y - 0.3f);
+		 		}
+		 	}
+		 	rb.constraints = RigidbodyConstraints2D.None;
+		 	rb.mass = 35f;			//Allows the enemy to move up the staris quicker
+		 	stairsTag = tag;
+			StartCoroutine(WaitForStairs());
+		 }	
 		if (tag == "Fire")
 			TakeDamage(1000f);		//Instantly die if you touch fire	
 	}
 
 	private void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Contains("Stairs"))
-			inStairs = true;	
+			stairsTag = col.gameObject.tag;	
 	}
 
 	void OnCollisionExit2D (Collision2D col) {
 		string tag = col.gameObject.tag;
-		if (tag.Contains("Stairs") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger) {
+		if (tag.Contains("Stairs") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger && allowedToStairs) {
 			transform.localEulerAngles = new Vector3(0f ,0f, 0f);
 			rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 			rb.mass = 40f;
 			StartCoroutine(WaitForStairs());
-			inStairs = false;
+			stairsTag = "none";
+			rb.centerOfMass = new Vector2(center.x, center.y);
 		}
 	}
 
 	private void OnTriggerExit2D (Collider2D col) {
 		if (col.gameObject.tag.Contains("Stairs"))
-			inStairs = false;
+			stairsTag = "none";
 	}
-
 
 	void Move () {
 		float h;
@@ -117,7 +126,8 @@ public class PointyLegs : MonoBehaviour {
 			anim.SetTrigger("Death");
 			rb.Sleep();
 			rb.constraints = RigidbodyConstraints2D.FreezeAll;
-			GetComponent<PolygonCollider2D>().isTrigger = true;
+			stairsTag = "none";
+			GetComponent<PolygonCollider2D>().enabled = false;
 			enabled = false;
 		}
 	}
@@ -132,7 +142,7 @@ public class PointyLegs : MonoBehaviour {
     //Wait to collide with stairs *glitch fix*
     private IEnumerator WaitForStairs () {
     	allowedToStairs = false;
-    	yield return new WaitForSeconds(3f);
+    	yield return new WaitForSeconds(4f);
     	allowedToStairs = true;
     }
 
@@ -141,6 +151,5 @@ public class PointyLegs : MonoBehaviour {
     	yield return new WaitForSeconds(0.32f);
     	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.4f)
     		playerH.TakeDamage(10f);
-    	attacking = false;
     }
 }

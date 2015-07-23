@@ -12,14 +12,14 @@ public class CollisionRemover : MonoBehaviour {
 	}
 
 	private void OnMouseDown () {
-		if (!playerCtrl.inStairs && !pointy.inStairs) {
+		if (!playerCtrl.stairsTag.Equals(transform.tag) && !pointy.stairsTag.Equals(transform.tag)) {
 			GetComponent<PolygonCollider2D>().isTrigger = !GetComponent<PolygonCollider2D>().isTrigger;
 			GetComponent<PolygonCollider2D>().usedByEffector = !GetComponent<PolygonCollider2D>().usedByEffector;
 		}
 	}
 
 	private void OnTouchStart () {
-		if (!playerCtrl.inStairs && !pointy.inStairs) {
+		if (playerCtrl.stairsTag.Equals(pointy.stairsTag) && !playerCtrl.stairsTag.Equals("none")) {
 			GetComponent<PolygonCollider2D>().isTrigger = !GetComponent<PolygonCollider2D>().isTrigger;
 			GetComponent<PolygonCollider2D>().usedByEffector = !GetComponent<PolygonCollider2D>().usedByEffector;
 		}
