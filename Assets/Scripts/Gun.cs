@@ -7,8 +7,8 @@ public class Gun : MonoBehaviour {
 	public float shiftX = 1.25f;
 	public float  shiftY = 0.81f;
 	private Vector3 position;
-	public bool allowedToShoot = true;		//Makes sure that the deltatime between the last shot is not too short.
-	public AudioClip shootClip;			// Clip for when the player shoots.
+	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
+	public AudioClip shootClip;				// Clip for when the player shoots.
 
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator component.
@@ -45,7 +45,7 @@ public class Gun : MonoBehaviour {
 	//You just shot the gun, wait to shoot again.
 	private IEnumerator Wait () {
         allowedToShoot = false;
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1.2f);
         allowedToShoot = true;
     }
 }

@@ -3,21 +3,32 @@ using System.Collections;
 
 public class Activate : MonoBehaviour {
 
-	private new Light light;
+	private Light accessLight;
+	private Light doorLight;
 	private Transform player;
 
+	public AudioClip activateClip;				// Clip for when the player shoots.
+
 	private void Awake () {
-		light = GetComponent<Light>();
+		accessLight = GetComponent<Light>();
+		char i = transform.tag[transform.tag.Length-1];
+		doorLight = GameObject.FindGameObjectWithTag("Door"+i).GetComponent<Light>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 	
 	private void OnMouseDown () {
-		if (Mathf.Abs(player.position.x - transform.position.x) < 5f)
-			light.enabled = !light.enabled;
+		Enable();
 	}
 
 	private void OnTouchStart () {
-		if (Mathf.Abs(player.position.x - transform.position.x) < 5f)
-			light.enabled = !light.enabled;
+		Enable();
+	}
+
+	private void Enable () {
+		if (Mathf.Abs(player.position.x - transform.position.x) < 5f && Mathf.Abs(player.position.y - transform.position.y) < 2f) { 
+			accessLight.enabled = !accessLight.enabled;
+		 	doorLight.enabled = !doorLight.enabled;
+			AudioSource.PlayClipAtPoint(activateClip, transform.position);
+		}
 	}		
 }

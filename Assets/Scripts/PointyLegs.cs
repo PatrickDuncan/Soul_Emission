@@ -7,12 +7,14 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;
 	private bool allowedToStairs = true;
 	public bool attacking = false;
-	public string stairsTag = "none";			// If interacting with the stairs in any way.
+	public string stairsTag = "none";		// If interacting with the stairs in any way.
 	public float moveForce = 365f;			// Amount of force added to move the player left and right.
 	public float maxSpeed = 1f;				// The fastest the player can travel in the x axis.
 	public float health = 45f;
 	private Vector2 center;
 	private Vector2 playerPos;
+	public AudioClip swingClip;
+	public AudioClip deathClip;
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;
@@ -36,6 +38,7 @@ public class PointyLegs : MonoBehaviour {
 			attacking = true;
 			StartCoroutine(PlayerHurt());
 			StartCoroutine(WaitToAttack());
+			AudioSource.PlayClipAtPoint(swingClip, transform.position);
 		}
 		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.4f) {
 			anim.SetTrigger("Walk");
@@ -124,6 +127,7 @@ public class PointyLegs : MonoBehaviour {
 		//When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
+			AudioSource.PlayClipAtPoint(deathClip, transform.position);
 			rb.Sleep();
 			rb.constraints = RigidbodyConstraints2D.FreezeAll;
 			stairsTag = "none";
@@ -135,7 +139,7 @@ public class PointyLegs : MonoBehaviour {
 	//Wait to attack again.
 	private IEnumerator WaitToAttack () {
         allowedToAttack = false;
-        yield return new WaitForSeconds(3.5f);
+        yield return new WaitForSeconds(3f);
         allowedToAttack = true;
     }
 

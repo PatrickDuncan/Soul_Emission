@@ -25,13 +25,11 @@ public class PlayerControl : MonoBehaviour {
 		float h = Input.GetAxis("Horizontal");
 		Physics(h);
 		//Touch Input
-		if (Input.touchCount == 1) {
-	     	if (Input.touches[0].position.x < Screen.width/2) {
+		if (Input.touchCount == 1 && Input.touches[0].position.x < Screen.width/2) {
+	     	if (Input.touches[0].position.x < Screen.width/4)
 	     		Physics(-1);	         	
-	         }
-	         else if (Input.touches[0].position.x > Screen.width/2) {
+	         else if (Input.touches[0].position.x > Screen.width/4)
 	         	Physics(1);  	
-	     	}
 	    }
 	}
 

@@ -3,20 +3,24 @@ using System.Collections;
 
 public class PlayerHealth : MonoBehaviour {
 	[HideInInspector]	
-	public float health = 50f;					// The player's health maximum.
+	public float health = 50f;				// The player's health maximum.
 	[HideInInspector]			
-	public float currentH;						// The player's current health.
+	public float currentH;					// The player's current health.
 	[HideInInspector]
-	public bool isDead = false;					// If the player is dead
+	public bool isDead = false;				// If the player is dead
 
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
-	private Animator anim;						// Reference to the Animator on the player
+	private Animator anim;					// Reference to the Animator on the player
+	private Gun gun;						// Reference to the Gun class
 
 	private object[,] reset;
+	public AudioClip injuryClip;			// Clip for when the player gets injured.
+	public AudioClip deathClip;				// Clip for when the player dies
 
 	private void Awake () {
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
+		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
 		currentH = health;
 		loadReset();
 	}
@@ -31,10 +35,13 @@ public class PlayerHealth : MonoBehaviour {
 		if (currentH <= 0f && !isDead) {
 			isDead = true;
 			anim.SetTrigger("DeathRight");
+			AudioSource.PlayClipAtPoint(deathClip, transform.position);
 			GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 			playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
+			gun.allowedToShoot = false;
 			StartCoroutine(Revive());
-		}
+		} else
+			AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	//Only one sound when you die
 	}
 
 	private IEnumerator Revive () {
@@ -43,8 +50,9 @@ public class PlayerHealth : MonoBehaviour {
     	GetComponent<PolygonCollider2D>().enabled = true;
     	currentH = health/2;
     	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
+    	gun.allowedToShoot = true;
     	ResetPositions();
-    	isDead = true;
+    	isDead = false;
 	}
 
 	//Reset the scene and bring the players health to half of the maximum
