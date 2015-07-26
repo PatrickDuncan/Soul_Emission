@@ -33,7 +33,7 @@ public class PointyLegs : MonoBehaviour {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
 		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
 			Flip();
-		if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) < 2.4f && Mathf.Abs(playerPos.y - transform.position.y) < 1f) {
+		if (allowedToAttack && !playerH.isDead && Mathf.Abs(playerPos.x - transform.position.x) < 2.4f && Mathf.Abs(playerPos.y - transform.position.y) < 1f) {
 			anim.SetTrigger("Attack");
 			attacking = true;
 			StartCoroutine(PlayerHurt());

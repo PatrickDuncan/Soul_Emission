@@ -21,7 +21,7 @@ public class Gun : MonoBehaviour {
 	}
 
 	private void FixedUpdate () {
-		if (Input.GetButtonDown("Fire1") && allowedToShoot) {
+		if ((Input.GetButtonDown("Fire1") || (Input.touchCount == 1 && Input.touches[0].position.x > Screen.width/2 && Input.touches[0].position.y < Screen.height/2)) && allowedToShoot) {
 			// ... set the animator Shoot trigger parameter and play the audioclip.
 			if (playerCtrl.isRight)
 				anim.SetTrigger("RightShoot");

@@ -2,8 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 public class PlayerHealth : MonoBehaviour {
-	[HideInInspector]	
-	public float health = 50f;				// The player's health maximum.
+	public float health = 10f;				// The player's health maximum.
 	[HideInInspector]			
 	public float currentH;					// The player's current health.
 	[HideInInspector]
@@ -11,7 +10,7 @@ public class PlayerHealth : MonoBehaviour {
 
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator on the player
-	private Gun gun;						// Reference to the Gun class
+	public Gun gun;						// Reference to the Gun class
 
 	private object[,] reset;
 	public AudioClip injuryClip;			// Clip for when the player gets injured.
@@ -31,21 +30,27 @@ public class PlayerHealth : MonoBehaviour {
 	}
 
 	public void TakeDamage (float damageAmount) {
-		currentH -= damageAmount;
-		if (currentH <= 0f && !isDead) {
-			isDead = true;
-			anim.SetTrigger("DeathRight");
-			AudioSource.PlayClipAtPoint(deathClip, transform.position);
-			GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-			playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
-			gun.allowedToShoot = false;
-			StartCoroutine(Revive());
-		} else
-			AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	//Only one sound when you die
+		if (!playerCtrl.isGhost && !isDead) {
+			currentH -= damageAmount;
+			playerCtrl.helmetLight.intensity -= 0.2f;
+			if (currentH <= 0f) {
+				isDead = true;
+				if (playerCtrl.isRight)
+					anim.SetTrigger("DeathRight");
+				else
+					anim.SetTrigger("DeathLeft");
+				AudioSource.PlayClipAtPoint(deathClip, transform.position);
+				GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+				playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
+				gun.allowedToShoot = false;
+				StartCoroutine(Revive());
+			} else
+				AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	//Only one sound when you die
+		}
 	}
 
 	private IEnumerator Revive () {
-    	yield return new WaitForSeconds(3f);
+    	yield return new WaitForSeconds(5f);
     	anim.SetTrigger("IdleRight");
     	GetComponent<PolygonCollider2D>().enabled = true;
     	currentH = health/2;
@@ -59,7 +64,8 @@ public class PlayerHealth : MonoBehaviour {
 	private void ResetPositions () {
     	transform.position = (Vector3)reset[0, 0];
     	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-    	playerCtrl.isRight = (bool)reset[0, 1];;
+		print(currentH);
+    	playerCtrl.isRight = (bool)reset[0, 1];
     	playerCtrl.resetHelmet();
     	GameObject.FindGameObjectWithTag("PointyLegs1").transform.position = (Vector3)reset[1, 0];
     	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().isRight = (bool)reset[1, 1];
