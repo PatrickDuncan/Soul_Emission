@@ -2,13 +2,12 @@
 using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
-	[HideInInspector]
 	public bool isRight = true;				// For determining which way the player is currently facing.
 	public bool isGhost = false;			// For determining if the player is using ghost powers.
 	public bool allowedToGhost = true;		// For determining if the player is using ghost powers.
 	public string stairsTag = "none";		// If interacting with the stairs in any way.
-	public float moveForce = 365f;			// Amount of force added to move the player left and right.
-	private float maxSpeed = 1.5f;				// The fastest the player can travel in the x axis.
+	public readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
+	private float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	public Quaternion defaultLight;			// Default position of the helmet light
 
@@ -35,15 +34,17 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void FixedUpdate ()	{
-		float h = Input.GetAxis("Horizontal");
-		Physics(h);
-		//Touch Input
-		if (Input.touchCount == 1 && Input.touches[0].position.x < Screen.width/2 && Input.touches[0].position.y < Screen.height/2) {
-	     	if (Input.touches[0].position.x < Screen.width/4)
-	     		Physics(-1);	         	
-	         else if (Input.touches[0].position.x > Screen.width/4)
-	         	Physics(1);  	
-	    }
+		if (!playerH.isDead) {
+			float h = Input.GetAxis("Horizontal");
+			Physics(h);
+			//Touch Input
+			if (Input.touchCount == 1 && Input.touches[0].position.x < Screen.width/2 && Input.touches[0].position.y < Screen.height/2) {
+		     	if (Input.touches[0].position.x < Screen.width/4)
+		     		Physics(-1);	         	
+		        else if (Input.touches[0].position.x > Screen.width/4)
+		         	Physics(1);  	
+		    }
+		}
 	}
 
 	private void Physics (float h) {
@@ -52,7 +53,7 @@ public class PlayerControl : MonoBehaviour {
 		if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314) {
 			// If the player is changing direction (h has a different sign to velocity.x) or hasn't reached maxSpeed yet
 			if (h * rigid.velocity.x < maxSpeed)
-				rigid.AddForce(Vector2.right * h * moveForce);
+				rigid.AddForce(Vector2.right * h * MOVEFORCE);
 			if (Mathf.Abs(rigid.velocity.x) > maxSpeed)
 				// ... set the player's velocity to the maxSpeed in the x axis.
 				rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * maxSpeed, rigid.velocity.y);
@@ -71,17 +72,26 @@ public class PlayerControl : MonoBehaviour {
 		gameObject.layer = LayerMask.NameToLayer("Ghost");
 		previousIntensity = helmetLight.intensity;
 		helmetLight.intensity = 4;
-		playerH.gun.allowedToShoot = false;
 		GetComponent<AudioSource>().pitch = 3f;
 		maxSpeed = 3f;
 		StartCoroutine(GhostTime());
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag == "Fire")
+		if (col.gameObject.tag.Equals("Fire"))
 			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
 		if (col.gameObject.tag.Contains("Stairs"))
 			stairsTag = "tag";
+		if (col.gameObject.tag.Contains("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
+			//If right door move to next scene, if left move to previous
+			int i = Application.loadedLevel;
+			//Get the name of the door's sprite
+			string facing = GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<SpriteRenderer>().sprite.ToString();
+			if (facing.Contains("Right"))
+				Application.LoadLevel(i + 1);
+			else if (facing.Contains("Left"))
+				Application.LoadLevel(i - 1);
+		}
 	}
 
 	private void OnTriggerEnter2D (Collider2D col) {
@@ -124,13 +134,12 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private IEnumerator GhostTime () {
-    	yield return new WaitForSeconds(3f);
+    	yield return new WaitForSeconds(4f);
     	if (isRight)
 			anim.SetTrigger("IdleRight");
 		else
 			anim.SetTrigger("IdleLeft");
     	rigid.gravityScale = 1.8f;
-    	playerH.gun.allowedToShoot = true;
     	gameObject.layer = LayerMask.NameToLayer("Default");
     	GetComponent<AudioSource>().pitch = 0.4f;
     	helmetLight.intensity = previousIntensity;

@@ -8,8 +8,8 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToStairs = true;
 	public bool attacking = false;
 	public string stairsTag = "none";		// If interacting with the stairs in any way.
-	public float moveForce = 365f;			// Amount of force added to move the player left and right.
-	public float maxSpeed = 1f;				// The fastest the player can travel in the x axis.
+	public readonly float MOVEFORCE = 365f;			// Amount of force added to move the player left and right.
+	public readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;
 	private Vector2 center;
 	private Vector2 playerPos;
@@ -108,11 +108,11 @@ public class PointyLegs : MonoBehaviour {
 			h = 1f;
 		else
 			h = -1f; 
-		if (h * GetComponent<Rigidbody2D>().velocity.x < maxSpeed)
-			GetComponent<Rigidbody2D>().AddForce(Vector2.right * h * moveForce);
-		if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) > maxSpeed)
-			// ... set the player's velocity to the maxSpeed in the x axis.
-			GetComponent<Rigidbody2D>().velocity = new Vector2(Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) * maxSpeed, GetComponent<Rigidbody2D>().velocity.y);
+		if (h * GetComponent<Rigidbody2D>().velocity.x < MAXSPEED)
+			GetComponent<Rigidbody2D>().AddForce(Vector2.right * h * MOVEFORCE);
+		if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) > MAXSPEED)
+			// ... set the player's velocity to the MAXSPEED in the x axis.
+			GetComponent<Rigidbody2D>().velocity = new Vector2(Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) * MAXSPEED, GetComponent<Rigidbody2D>().velocity.y);
 	}
 
 	void Flip () {
