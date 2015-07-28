@@ -24,6 +24,8 @@ public class Gun : MonoBehaviour {
 		//Only able to shoot if the right input is pressed, the allowedToShoot boolean is true and the player is not a ghost.
 		if ((Input.GetButtonDown("Fire1") || (Input.touchCount == 1 && Input.touches[0].position.x > Screen.width/2 && Input.touches[0].position.y < Screen.height/2)) && allowedToShoot && !playerCtrl.isGhost) {
 			// ... set the animator Shoot trigger parameter and play the audioclip.
+			allowedToShoot = false;
+        	playerCtrl.allowedToGhost = false;
 			if (playerCtrl.isRight)
 				anim.SetTrigger("RightShoot");
 			else
@@ -45,8 +47,6 @@ public class Gun : MonoBehaviour {
 
 	//You just shot the gun, wait to shoot again.
 	private IEnumerator Wait () {
-        allowedToShoot = false;
-        playerCtrl.allowedToGhost = false;
         yield return new WaitForSeconds(1.2f);
         allowedToShoot = true;
         playerCtrl.allowedToGhost = true;
