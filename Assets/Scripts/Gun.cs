@@ -46,7 +46,9 @@ public class Gun : MonoBehaviour {
 	//You just shot the gun, wait to shoot again.
 	private IEnumerator Wait () {
         allowedToShoot = false;
+        playerCtrl.allowedToGhost = false;
         yield return new WaitForSeconds(1.2f);
         allowedToShoot = true;
+        playerCtrl.allowedToGhost = true;
     }
 }

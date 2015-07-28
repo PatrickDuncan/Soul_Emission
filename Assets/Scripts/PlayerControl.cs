@@ -29,6 +29,7 @@ public class PlayerControl : MonoBehaviour {
 
 	private void Update () {
 	    if (Input.GetButtonDown("Fire2") && allowedToGhost) {
+	    	allowedToGhost = false;
 	    	Ghost();  
 	    }
 	}
@@ -149,7 +150,6 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private IEnumerator WaitForGhost () {
-		allowedToGhost = false;
     	yield return new WaitForSeconds(10f);
     	allowedToGhost = true;
 	}
