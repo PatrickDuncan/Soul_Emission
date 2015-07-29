@@ -4,9 +4,9 @@ using System.Collections;
 public class Gun : MonoBehaviour {
 	public Rigidbody2D bullet;				// Prefab of the bullet.
 	private readonly float SPEED = 20f;		// The SPEED the bullet will fire at.
-	public readonly float SHIFTX = 1.25f;   // Constant x shift
-	public readonly float SHIFTY = 0.81f;   // Constant y shift
-	private Vector3 position;
+	public readonly float SHIFTX = 1.25f;   // Constant x shift.
+	public readonly float SHIFTY = 0.81f;   // Constant y shift.
+	private Vector3 position;				// For setting the position relative to the player.
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	
 	public AudioClip shootClip;				// Clip for when the player shoots.

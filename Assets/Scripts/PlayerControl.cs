@@ -11,12 +11,11 @@ public class PlayerControl : MonoBehaviour {
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	public Quaternion defaultLight;			// Default position of the helmet light
 
-	private Animator anim;					
-	public Transform helmet;
-	public Light helmetLight;
-	private Quaternion rotation;
-	private PlayerHealth playerH;
-	private Rigidbody2D rigid;
+	private Animator anim;					// Reference to the Animator component				
+	public Transform helmet;				// Reference to the helmet object's transfrom
+	public Light helmetLight;				// Reference to the helmet object's light
+	private PlayerHealth playerH;			// Reference to the PlayerHealth script
+	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component
 
 	private void Awake () {
 		helmet = GameObject.FindGameObjectWithTag("Helmetlight").transform;
@@ -25,6 +24,8 @@ public class PlayerControl : MonoBehaviour {
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
 		rigid = GetComponent<Rigidbody2D>();
+		if (!isRight)
+			resetHelmet();
 	}
 
 	private void Update () {

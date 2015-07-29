@@ -3,11 +3,11 @@ using System.Collections;
 
 public class Activate : MonoBehaviour {
 
-	private Light accessLight;
-	private Light doorLight;
-	private Transform player;
+	private Light accessLight;				// Reference to the access' light.
+	private Light doorLight;				// Reference to the door's light.
+	private Transform player;				// Reference to the player's transform.
 
-	public AudioClip activateClip;				// Clip for when the player shoots.
+	public AudioClip activateClip;			// Clip for when the player shoots.
 
 	private void Awake () {
 		accessLight = GetComponent<Light>();

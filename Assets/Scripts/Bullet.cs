@@ -4,7 +4,7 @@ using System.Collections;
 public class Bullet : MonoBehaviour {
 
 	private void Start () {
-		Destroy(gameObject, 1);
+		Destroy(gameObject, 1f);		//Automatically destroy the bullet in 1 second.
 	}
 	
 	private void OnTriggerEnter2D (Collider2D col) {

@@ -3,8 +3,8 @@ using System.Collections;
 
 public class CollisionRemover : MonoBehaviour {		
 
-	PlayerControl playerCtrl;
-	PointyLegs pointy;
+	PlayerControl playerCtrl;			// Reference to the PlayerControl script.
+	PointyLegs pointy;					// Reference to the PointyLegs script.
 
 	private void Awake () {
 		playerCtrl = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();

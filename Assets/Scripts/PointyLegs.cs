@@ -4,22 +4,22 @@ using System.Collections;
 public class PointyLegs : MonoBehaviour {
 
 	public bool isRight = false;			// For determining which way the pointy legs is currently facing.	
-	private bool allowedToAttack = true;
-	private bool allowedToStairs = true;
-	public bool attacking = false;
+	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
+	private bool allowedToStairs = true;	// If pointy legs can go through the stair collision algorithm.
+	public bool attacking = false;			// If pointy legs is currently swinging its arms to attack.
 	public string stairsTag = "none";		// If interacting with the stairs in any way.
-	public readonly float MOVEFORCE = 365f;			// Amount of force added to move the player left and right.
+	public readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	public readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
-	public float health = 45f;
-	private Vector2 center;
-	private Vector2 playerPos;
-	public AudioClip swingClip;
-	public AudioClip deathClip;
+	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
+	private Vector2 center;					// The center of mass.
+	private Vector2 playerPos;				// The player's position.
+	public AudioClip swingClip;				// Clip for when pointy legs attacks.
+	public AudioClip deathClip;				// CLip for when pointy legs meets its end.
 
 	private Animator anim;					// Reference to the Animator component.
-	private Transform player;
-	private Rigidbody2D rb;
-	private PlayerHealth playerH;
+	private Transform player;				// Reference to the Player's transform.
+	private Rigidbody2D rb;					// Reference to the Rigidbody2D component.
+	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 
 	void Awake () {
 		anim = transform.root.gameObject.GetComponent<Animator>();

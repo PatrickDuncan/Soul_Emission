@@ -10,7 +10,7 @@ public class PlayerHealth : MonoBehaviour {
 	public float currentH;					// The player's current health.
 	[HideInInspector]
 	public bool isDead = false;				// If the player is dead
-	private object[,] reset;
+	private object[,] reset;				// Will hold all positions for the player/enemies
 
 	private Animator ripAnim;				// Reference to Rip's Animator
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer
@@ -29,27 +29,29 @@ public class PlayerHealth : MonoBehaviour {
 		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
 		currentH = HEALTH;
 		loadReset();
+		//ResetPositions();
 	}
 
 	private void loadReset () {
-	    try {
-	        string positions = Application.dataPath + "/Misc/Positions.txt";
-	        int lines = File.ReadAllLines(positions).Length;
-	        reset = new object[lines, 2];
-	        StreamReader fileData = new StreamReader(positions, Encoding.Default);
-	        for (int i=0; i<lines; i++) {
-	        	string[] s = fileData.ReadLine().Split('$');
-	        	string[] values = s[0].Split(' ');
-	        	reset[i, 0] = new Vector3(Convert.ToSingle(values[0]), Convert.ToSingle(values[1]), Convert.ToSingle(values[2]));
-	        	reset[i, 1] = Convert.ToBoolean(s[1]);
-	        }
-	        fileData.Close();
-    	}
-        catch (Exception e) {
-            Console.WriteLine(e.Message);
-        }
-		// reset = new object[,] { {new Vector3(-36.12f, -7.06f, 0f), true}, 	//Player
-		// 					{new Vector3(0.67f, -6.91f, 0.58f), false} };	//Pointy Legs 1
+		// print(Application.persistentDataPath);
+	 //    try {
+	 //        string positions = Application.persistentDataPath + "/Positions.txt";
+	 //        int lines = File.ReadAllLines(positions).Length;
+	 //        reset = new object[lines, 2];
+	 //        StreamReader fileData = new StreamReader(positions, Encoding.Default);
+	 //        for (int i=0; i<lines; i++) {
+	 //        	string[] s = fileData.ReadLine().Split('$');
+	 //        	string[] values = s[0].Split(' ');
+	 //        	reset[i, 0] = new Vector3(Convert.ToSingle(values[0]), Convert.ToSingle(values[1]), Convert.ToSingle(values[2]));
+	 //        	reset[i, 1] = Convert.ToBoolean(s[1]);
+	 //        }
+	 //        fileData.Close();
+  //   	}
+  //       catch (Exception e) {
+  //           Console.WriteLine(e.Message);
+  //       }
+		reset = new object[,] { {new Vector3(-36.12f, -7.06f, 0f), true}, 	//Player
+							{new Vector3(0.67f, -6.91f, 0.58f), false} };	//Pointy Legs 1
 	}
 
 	public void TakeDamage (float damageAmount) {
