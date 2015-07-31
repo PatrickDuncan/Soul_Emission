@@ -5,7 +5,6 @@ public class PlayerControl : MonoBehaviour {
 	public bool isRight = true;				// For determining which way the player is currently facing.
 	public bool isGhost = false;			// For determining if the player is using ghost powers.
 	public bool allowedToGhost = true;		// For determining if the player is using ghost powers.
-	public string stairsTag = "none";		// If interacting with the stairs in any way.
 	public readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	private float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
@@ -82,8 +81,6 @@ public class PlayerControl : MonoBehaviour {
 	private void OnCollisionEnter2D (Collision2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
 			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
-		if (col.gameObject.tag.Contains("Stairs"))
-			stairsTag = "tag";
 		if (col.gameObject.tag.Contains("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
 			//If right door move to next scene, if left move to previous
 			int i = Application.loadedLevel;
@@ -94,21 +91,6 @@ public class PlayerControl : MonoBehaviour {
 			else if (facing.Contains("Left"))
 				Application.LoadLevel(i - 1);
 		}
-	}
-
-	private void OnTriggerEnter2D (Collider2D col) {
-		if (col.gameObject.tag.Contains("Stairs"))
-			stairsTag = col.gameObject.tag;	
-	}
-
-	private void OnCollisionExit2D (Collision2D col) {
-		if (col.gameObject.tag.Contains("Stairs"))
-			stairsTag = "none";
-	}
-
-	private void OnTriggerExit2D (Collider2D col) {
-		if (col.gameObject.tag.Contains("Stairs"))
-			stairsTag = "none";
 	}
 
 	private void Flip () {
