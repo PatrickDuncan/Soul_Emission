@@ -15,6 +15,7 @@ public class PlayerControl : MonoBehaviour {
 	public Light helmetLight;				// Reference to the helmet object's light
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component
+	private Lift lift;						// Reference to the Lift script.
 
 	private void Awake () {
 		helmet = GameObject.FindGameObjectWithTag("Helmetlight").transform;
@@ -22,15 +23,20 @@ public class PlayerControl : MonoBehaviour {
 		anim = GetComponent<Animator>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
+		lift = GameObject.FindGameObjectWithTag("Beam").GetComponent<Lift>();
 		rigid = GetComponent<Rigidbody2D>();
 		if (!isRight)
 			resetHelmet();
 	}
 
 	private void Update () {
-	    if (Input.GetButtonDown("Fire2") && allowedToGhost) {
-	    	allowedToGhost = false;
-	    	Ghost();  
+	    if (Input.GetButtonDown("Fire2") && allowedToGhost && lift.allowedToBeam) {
+	    	//fullPathHash gets the current animation clip
+			//Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting
+	    	if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314 && rigid.gravityScale == 1.8f) {
+	    		allowedToGhost = false;
+	    		Ghost();  
+	    	}
 	    }
 	}
 
@@ -63,7 +69,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
-	private void Ghost () {
+	private void Ghost () {	
 		isGhost = true;
 		if (isRight)
 			anim.SetTrigger("GhostRight");
@@ -81,11 +87,11 @@ public class PlayerControl : MonoBehaviour {
 	private void OnCollisionEnter2D (Collision2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
 			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
-		if (col.gameObject.tag.Contains("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
+		if (col.gameObject.tag.Equals("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
 			//If right door move to next scene, if left move to previous
 			int i = Application.loadedLevel;
 			//Get the name of the door's sprite
-			string facing = GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<SpriteRenderer>().sprite.ToString();
+			string facing = GameObject.FindWithTag(col.gameObject.tag).GetComponent<SpriteRenderer>().sprite.ToString();
 			if (facing.Contains("Right"))
 				Application.LoadLevel(i + 1);
 			else if (facing.Contains("Left"))

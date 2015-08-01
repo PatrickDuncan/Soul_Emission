@@ -10,7 +10,7 @@ public class PlayerHealth : MonoBehaviour {
 	public float currentH;					// The player's current health.
 	[HideInInspector]
 	public bool isDead = false;				// If the player is dead
-	private object[,] reset;				// Will hold all positions for the player/enemies
+	private object[] reset;				// Will hold all positions for the player/enemies
 
 	private Animator ripAnim;				// Reference to Rip's Animator
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer
@@ -50,8 +50,8 @@ public class PlayerHealth : MonoBehaviour {
   //       catch (Exception e) {
   //           Console.WriteLine(e.Message);
   //       }
-		reset = new object[,] { {new Vector3(-36.12f, -7.06f, 0f), true}, 	//Player
-							{new Vector3(0.67f, -6.91f, 0.58f), false} };	//Pointy Legs 1
+		reset = new object[] {new Vector3(-36.12f, -7.06f, 0f), 	//Player
+							new Vector3(0.67f, -6.91f, 0.58f)};	//Pointy Legs 1
 	}
 
 	public void TakeDamage (float damageAmount) {
@@ -94,13 +94,12 @@ public class PlayerHealth : MonoBehaviour {
 
 	//Reset the scene and bring the players HEALTH to half of the maximum
 	private void ResetPositions () {
-    	transform.position = (Vector3)reset[0, 0];
+    	transform.position = (Vector3)reset[0];
     	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-    	playerCtrl.isRight = (bool)reset[0, 1];
+    	playerCtrl.isRight = true;
     	playerCtrl.resetHelmet();
     	playerCtrl.helmetLight.intensity = 1.5f;
-    	GameObject.FindGameObjectWithTag("PointyLegs1").transform.position = (Vector3)reset[1, 0];
-    	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().isRight = (bool)reset[1, 1];
+    	GameObject.FindGameObjectWithTag("PointyLegs1").transform.position = (Vector3)reset[1];
     	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().health = 45f;
     }
 }

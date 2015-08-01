@@ -36,7 +36,7 @@ public class PointyLegs : MonoBehaviour {
 			StartCoroutine(WaitToAttack());
 			AudioSource.PlayClipAtPoint(swingClip, transform.position);
 		}
-		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.4f) {
+		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.4f  && Mathf.Abs(playerPos.y - transform.position.y) < 2f) {
 			anim.SetTrigger("Walk");
 			attacking = false;
 			Move();

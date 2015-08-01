@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Lift : MonoBehaviour {		
 
+	public bool allowedToBeam = true;		// If the player can use the beam.
+
 	private Rigidbody2D rigid;				// Reference to the player's rigid body.
 	private PolygonCollider2D poly;			// Reference to the player's polygon collider.
 	private Transform player;				// Reference to the player's transform.
@@ -20,23 +22,24 @@ public class Lift : MonoBehaviour {
 	}
 
 	public void OnMouseDown () {
-		if (GetComponent<PolygonCollider2D>().IsTouching(poly)) {
+		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost) {
 			if (transform.position.y < player.position.y) {
 				anim.SetTrigger("BeamDown");
 				rigid.gravityScale = 0.1f;
 			}
 			else {
 				anim.SetTrigger("BeamUp");
-				rigid.gravityScale = -0.1f;		//Negative gravity makes
+				rigid.gravityScale = -0.1f;		//Negative gravity makes it up up.
 			}
 			poly.isTrigger = true;
 			gun.allowedToShoot = false;
-			playerCtrl.allowedToGhost = false;
+			rigid.constraints = RigidbodyConstraints2D.FreezePositionX;
+			StartCoroutine(WaitForBeam());
 		}
 	}
 
 	private void OnTouchStart () {
-		if (GetComponent<PolygonCollider2D>().IsTouching(poly)) {
+		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost) {
 			if (transform.position.y < player.position.y) {
 				anim.SetTrigger("BeamDown");
 				rigid.gravityScale = 0.1f;
@@ -47,7 +50,8 @@ public class Lift : MonoBehaviour {
 			}
 			poly.isTrigger = true;
 			gun.allowedToShoot = false;
-			playerCtrl.allowedToGhost = false;
+			rigid.constraints = RigidbodyConstraints2D.FreezePositionX;
+			StartCoroutine(WaitForBeam());
 		}
 	}	
 
@@ -56,6 +60,14 @@ public class Lift : MonoBehaviour {
 		poly.isTrigger = false;
 		anim.SetTrigger("IdleBeam");
 		gun.allowedToShoot = true;
-		playerCtrl.allowedToGhost = true;
-	}		
+	}	
+	
+	private IEnumerator WaitForBeam () {
+		allowedToBeam = false;
+		yield return new WaitForSeconds(4f);
+		allowedToBeam = true;
+		rigid.constraints = RigidbodyConstraints2D.None;
+		rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
+
+	}	
 }
