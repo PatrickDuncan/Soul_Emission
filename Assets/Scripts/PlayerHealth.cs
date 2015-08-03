@@ -55,27 +55,35 @@ public class PlayerHealth : MonoBehaviour {
 	}
 
 	public void TakeDamage (float damageAmount) {
-		if (!playerCtrl.isGhost && !isDead) {
+		if (damageAmount == 1000 && !isDead)
+			Die();
+		else if (!playerCtrl.isGhost && !isDead) {
 			currentH -= damageAmount;
 			playerCtrl.helmetLight.intensity -= 0.2f;
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 0), ForceMode2D.Impulse);
 			if (currentH <= 0f) {
-				isDead = true;
-				if (playerCtrl.isRight)
-					anim.SetTrigger("DeathRight");
-				else
-					anim.SetTrigger("DeathLeft");
-				AudioSource.PlayClipAtPoint(deathClip, transform.position);
-				GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-				playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
-				gun.allowedToShoot = false;
-				playerCtrl.allowedToGhost = false;
-				ripSprite.enabled = true;
-				ripAnim.enabled = true;
-				StartCoroutine(Revive());
+				Die();
 			} else
 				AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	//Only one sound when you die
 		}
+	}
+
+	private void Die () {
+		isDead = true;
+		if (playerCtrl.isGhost)
+			playerCtrl.BackToNormal();
+		if (playerCtrl.isRight)
+			anim.SetTrigger("DeathRight");
+		else
+			anim.SetTrigger("DeathLeft");
+		AudioSource.PlayClipAtPoint(deathClip, transform.position);
+		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
+		gun.allowedToShoot = false;
+		playerCtrl.allowedToGhost = false;
+		ripSprite.enabled = true;
+		ripAnim.enabled = true;
+		StartCoroutine(Revive());
 	}
 
 	private IEnumerator Revive () {

@@ -9,6 +9,7 @@ public class Lift : MonoBehaviour {
 	private PolygonCollider2D poly;			// Reference to the player's polygon collider.
 	private Transform player;				// Reference to the player's transform.
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
+	private PlayerHealth playerH;			// Reference to the PlayerHl script.
 	private Animator anim;					// Reference to the Animator component.
 	private Gun gun;						// Reference to the Gun class
 
@@ -16,30 +17,24 @@ public class Lift : MonoBehaviour {
 		rigid = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
 		poly = GameObject.FindGameObjectWithTag("Player").GetComponent<PolygonCollider2D>();
 		playerCtrl = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
+		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
 		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		anim = GetComponent<Animator>();
 	}
 
 	public void OnMouseDown () {
-		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost) {
-			if (transform.position.y < player.position.y) {
-				anim.SetTrigger("BeamDown");
-				rigid.gravityScale = 0.1f;
-			}
-			else {
-				anim.SetTrigger("BeamUp");
-				rigid.gravityScale = -0.1f;		//Negative gravity makes it up up.
-			}
-			poly.isTrigger = true;
-			gun.allowedToShoot = false;
-			rigid.constraints = RigidbodyConstraints2D.FreezePositionX;
-			StartCoroutine(WaitForBeam());
-		}
+		Beam();
 	}
 
 	private void OnTouchStart () {
-		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost) {
+		Beam();
+	}
+
+	private void Beam() {
+		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost && !playerH.isDead) {
+			allowedToBeam = false;
+			playerCtrl.isBeam = true;
 			if (transform.position.y < player.position.y) {
 				anim.SetTrigger("BeamDown");
 				rigid.gravityScale = 0.1f;
@@ -50,24 +45,23 @@ public class Lift : MonoBehaviour {
 			}
 			poly.isTrigger = true;
 			gun.allowedToShoot = false;
-			rigid.constraints = RigidbodyConstraints2D.FreezePositionX;
+			rigid.velocity = new Vector2(0, 0);	
 			StartCoroutine(WaitForBeam());
 		}
-	}	
+	}
 
 	private void OnTriggerExit2D(Collider2D col) {
-		rigid.gravityScale = 1.8f;
-		poly.isTrigger = false;
-		anim.SetTrigger("IdleBeam");
-		gun.allowedToShoot = true;
+		if (!allowedToBeam) {
+			rigid.gravityScale = 1.8f;
+			poly.isTrigger = false;
+			gun.allowedToShoot = true;
+			playerCtrl.isBeam = false;
+			anim.SetTrigger("IdleBeam");
+		}
 	}	
 	
 	private IEnumerator WaitForBeam () {
-		allowedToBeam = false;
-		yield return new WaitForSeconds(4f);
+		yield return new WaitForSeconds(4.5f);
 		allowedToBeam = true;
-		rigid.constraints = RigidbodyConstraints2D.None;
-		rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
-
 	}	
 }

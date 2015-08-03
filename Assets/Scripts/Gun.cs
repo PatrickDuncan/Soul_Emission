@@ -3,9 +3,9 @@ using System.Collections;
 
 public class Gun : MonoBehaviour {
 	public Rigidbody2D bullet;				// Prefab of the bullet.
-	private readonly float SPEED = 20f;		// The SPEED the bullet will fire at.
-	public readonly float SHIFTX = 1.25f;   // Constant x shift.
-	public readonly float SHIFTY = 0.81f;   // Constant y shift.
+	private const float SPEED = 20f;		// The SPEED the bullet will fire at.
+	public const float SHIFTX = 1.25f;   	// Constant x shift.
+	public const float SHIFTY = 0.81f;   	// Constant y shift.
 	private Vector3 position;				// For setting the position relative to the player.
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	
@@ -46,7 +46,7 @@ public class Gun : MonoBehaviour {
 
 	//You just shot the gun, wait to shoot again.
 	private IEnumerator Wait () {
-        yield return new WaitForSeconds(1.2f);
+        yield return new WaitForSeconds(1.6f);
         allowedToShoot = true;
     }
 }
