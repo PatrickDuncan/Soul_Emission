@@ -9,17 +9,17 @@ public class PlayerHealth : MonoBehaviour {
 	[HideInInspector]			
 	public float currentH;					// The player's current health.
 	[HideInInspector]
-	public bool isDead = false;				// If the player is dead
-	private object[] reset;				// Will hold all positions for the player/enemies
+	public bool isDead = false;				// If the player is dead.
 
 	private Animator ripAnim;				// Reference to Rip's Animator
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
-	private Animator anim;					// Reference to the Animator on the player
-	public Gun gun;							// Reference to the Gun class
+	private Animator anim;					// Reference to the Animator on the player.
+	private Gun gun;						// Reference to the Gun class.
+	private Positions positions;				// Reference to the Positions class.
 
 	public AudioClip injuryClip;			// Clip for when the player gets injured.
-	public AudioClip deathClip;				// Clip for when the player dies
+	public AudioClip deathClip;				// Clip for when the player dies.
 
 	private void Awake () {
 		ripAnim = GameObject.FindGameObjectWithTag("Rip").GetComponent<Animator>();
@@ -27,33 +27,10 @@ public class PlayerHealth : MonoBehaviour {
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
 		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
+		positions = GetComponent<Positions>();
 		currentH = HEALTH;
-		loadReset();
-		//ResetPositions();
 	}
-
-	private void loadReset () {
-		// print(Application.persistentDataPath);
-	 //    try {
-	 //        string positions = Application.persistentDataPath + "/Positions.txt";
-	 //        int lines = File.ReadAllLines(positions).Length;
-	 //        reset = new object[lines, 2];
-	 //        StreamReader fileData = new StreamReader(positions, Encoding.Default);
-	 //        for (int i=0; i<lines; i++) {
-	 //        	string[] s = fileData.ReadLine().Split('$');
-	 //        	string[] values = s[0].Split(' ');
-	 //        	reset[i, 0] = new Vector3(Convert.ToSingle(values[0]), Convert.ToSingle(values[1]), Convert.ToSingle(values[2]));
-	 //        	reset[i, 1] = Convert.ToBoolean(s[1]);
-	 //        }
-	 //        fileData.Close();
-  //   	}
-  //       catch (Exception e) {
-  //           Console.WriteLine(e.Message);
-  //       }
-		reset = new object[] {new Vector3(-36.12f, -7.06f, 0f), 	//Player
-							new Vector3(0.67f, -6.91f, 0.58f)};	//Pointy Legs 1
-	}
-
+	
 	public void TakeDamage (float damageAmount) {
 		if (damageAmount == 1000 && !isDead)
 			Die();
@@ -88,26 +65,31 @@ public class PlayerHealth : MonoBehaviour {
 
 	private IEnumerator Revive () {
     	yield return new WaitForSeconds(5f);
-    	anim.SetTrigger("IdleRight");
     	GetComponent<PolygonCollider2D>().enabled = true;
     	currentH = HEALTH/2;
     	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
     	gun.allowedToShoot = true;
     	playerCtrl.allowedToGhost = true;
     	ripSprite.enabled = false;
-    	ripAnim.enabled = false;
     	ResetPositions();
+    	ripAnim.enabled = false;
     	isDead = false;
 	}
 
 	//Reset the scene and bring the players HEALTH to half of the maximum
 	private void ResetPositions () {
-    	transform.position = (Vector3)reset[0];
+    	transform.position = positions.player;
     	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-    	playerCtrl.isRight = true;
+    	playerCtrl.isRight = positions.isRight;
     	playerCtrl.resetHelmet();
     	playerCtrl.helmetLight.intensity = 1.5f;
-    	GameObject.FindGameObjectWithTag("PointyLegs1").transform.position = (Vector3)reset[1];
-    	GameObject.FindGameObjectWithTag("PointyLegs1").GetComponent<PointyLegs>().health = 45f;
+    	// Loop through all the pointy legs in the scene and reset their positions.
+    	int	j = positions.pointyStart; 
+    	for (int i=0; i<positions.pointy.Length; i++) {
+	    	GameObject.FindWithTag("PointyLegs" + j).transform.position = positions.pointy[i];
+	    	if (GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health > 0f)
+	    		GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health = 45f;
+	    	j++;
+	    }
     }
 }

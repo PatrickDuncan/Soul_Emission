@@ -106,12 +106,12 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	public void resetHelmet () {
+		helmet.rotation = defaultLight;
 		if (isRight) {
 			if (isGhost)
 				anim.SetTrigger("GhostRight");
 			else 
 				anim.SetTrigger("IdleRight");
-			helmet.rotation = defaultLight;
 			helmet.position = new Vector3(-1.54f + transform.position.x, 2.36f + transform.position.y, -0.42f);
 		}
 		else {
@@ -125,7 +125,7 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private IEnumerator GhostTime () {
-    	yield return new WaitForSeconds(4f);
+    	yield return new WaitForSeconds(3.5f);
     	if (!playerH.isDead) {
 	    	if (isRight)
 				anim.SetTrigger("IdleRight");

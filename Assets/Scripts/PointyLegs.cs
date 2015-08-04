@@ -6,8 +6,8 @@ public class PointyLegs : MonoBehaviour {
 	public bool isRight = false;			// For determining which way the pointy legs is currently facing.	
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
 	public bool attacking = false;			// If pointy legs is currently swinging its arms to attack.
-	public readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	public readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
+	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
+	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip swingClip;				// Clip for when pointy legs attacks.
