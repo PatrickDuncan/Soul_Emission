@@ -83,6 +83,8 @@ public class PointyLegs : MonoBehaviour {
 			rb.constraints = RigidbodyConstraints2D.FreezeAll;
 			GetComponent<PolygonCollider2D>().enabled = false;
 			enabled = false;
+		} else {
+			anim.SetTrigger("Hurt");
 		}
 	}
 

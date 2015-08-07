@@ -15,5 +15,9 @@ public class Bullet : MonoBehaviour {
 			GameObject.FindWithTag(tag).GetComponent<PointyLegs>().TakeDamage(10f);
 			Destroy(gameObject);
 		}
+		else if (tag.Contains("FourEyes") && !GameObject.FindGameObjectWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger) {
+			GameObject.FindWithTag(tag).GetComponent<FourEyes>().TakeDamage(10f);
+			Destroy(gameObject);
+		}
 	}
 }

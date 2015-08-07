@@ -16,7 +16,7 @@ public class PlayerHealth : MonoBehaviour {
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator on the player.
 	private Gun gun;						// Reference to the Gun class.
-	private Positions positions;				// Reference to the Positions class.
+	private Positions positions;			// Reference to the Positions class.
 
 	public AudioClip injuryClip;			// Clip for when the player gets injured.
 	public AudioClip deathClip;				// Clip for when the player dies.
