@@ -1,58 +1,63 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class FourEyes : MonoBehaviour {
 
-	public bool isRight = false;			// For determining which way the pointy legs is currently facing.	
-	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
-	public bool attacking = false;			// If pointy legs is currently swinging its arms to attack.
+	public bool isRight;					// For determining which way the four eyes is currently facing.	
+	public bool hasFallen;					// For determining if the four eyes has fallen down.	
+	public bool allowedToMove;				// For determining if the four eyes is allowed to move.	
+	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 0.35f;	// The fastest the player can travel in the x axis.
-	public float health = 100f;				// The health points for this instance of the pointy legs prefab.
+	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
-	public AudioClip swingClip;				// Clip for when pointy legs attacks.
-	public AudioClip deathClip;				// CLip for when pointy legs meets its end.
+	public AudioClip deathClip;				// CLip for when four eyes meets its end.
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
-	private Rigidbody2D rb;					// Reference to the Rigidbody2D component.
+	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 
-	void Awake () {
+	private void Awake () {
 		anim = GetComponent<Animator>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
-		rb = GetComponent<Rigidbody2D>();
+		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
 	}
 
-	void Update () {
+	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
 		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
 			Flip();
-		if (allowedToAttack && !playerH.isDead && Mathf.Abs(playerPos.x - transform.position.x) < 2.4f && Mathf.Abs(playerPos.y - transform.position.y) < 1f) {
-			anim.SetTrigger("Attack");
-			attacking = true;
-			StartCoroutine(PlayerHurt());
-			StartCoroutine(WaitToAttack());
-			AudioSource.PlayClipAtPoint(swingClip, transform.position);
-		}
-		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.4f  && Mathf.Abs(playerPos.y - transform.position.y) < 2f) {
+		if (allowedToMove && hasFallen && !playerH.isDead && Mathf.Abs(playerPos.y - transform.position.y) < 5f) {
 			anim.SetTrigger("Walk");
-			attacking = false;
 			Move();
 		}
-		else {
-			//anim.SetTrigger("Idle");
-			attacking = false;
+		else if (!hasFallen && Mathf.Abs(playerPos.x - transform.position.x) < 13f  && playerPos.y < transform.position.y && Mathf.Abs(playerPos.y - transform.position.y) < 5f) {
+			hasFallen = true;
+			rigid.gravityScale = 1.8f;
+			StartCoroutine(WaitForFall());
+		}
+		else if (!allowedToMove && !hasFallen && Mathf.Abs(playerPos.y - transform.position.y) >= 10f){
+			anim.SetTrigger("Idle");
 		}		
 	}
 
-	void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag == "Fire")
-			TakeDamage(1000f);		//Instantly die if it touches fire	
+	private void OnCollisionStay2D (Collision2D col) {
+		if (allowedToAttack && col.gameObject.tag.Equals("Player")) {
+			allowedToAttack = false;
+			playerH.TakeDamage(1f);
+			StartCoroutine(WaitToAttack());
+		}
 	}
 
-	void Move () {
+	private void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag.Equals("Fire"))
+			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
+	}
+
+	private void Move () {
 		float h;
 		//If a Poiny Legs is to the left or right of a hero
 		if (playerPos.x > transform.position.x)
@@ -66,7 +71,7 @@ public class FourEyes : MonoBehaviour {
 			GetComponent<Rigidbody2D>().velocity = new Vector2(Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) * MAXSPEED, GetComponent<Rigidbody2D>().velocity.y);
 	}
 
-	void Flip () {
+	private void Flip () {
 		isRight = !isRight;
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
@@ -78,9 +83,13 @@ public class FourEyes : MonoBehaviour {
 		//When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
-			AudioSource.PlayClipAtPoint(deathClip, transform.position);
-			rb.Sleep();
-			rb.constraints = RigidbodyConstraints2D.FreezeAll;
+			try {
+				AudioSource.PlayClipAtPoint(deathClip, transform.position);
+			} catch (Exception e) {
+				print(e);
+			} 
+			rigid.Sleep();
+			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
 			GetComponent<PolygonCollider2D>().enabled = false;
 			enabled = false;
 		} else {
@@ -90,8 +99,7 @@ public class FourEyes : MonoBehaviour {
 
 	//Wait to attack again.
 	private IEnumerator WaitToAttack () {
-        allowedToAttack = false;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(0.5f);
         allowedToAttack = true;
     }
 
@@ -100,5 +108,13 @@ public class FourEyes : MonoBehaviour {
     	yield return new WaitForSeconds(0.32f);
     	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.4f)
     		playerH.TakeDamage(10f);
+    }
+
+    private IEnumerator WaitForFall () {
+    	yield return new WaitForSeconds(0.75f);
+    	allowedToMove = true;
+		GetComponent<PolygonCollider2D>().enabled = true;
+		anim.SetTrigger("Drop");
+		rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
 }

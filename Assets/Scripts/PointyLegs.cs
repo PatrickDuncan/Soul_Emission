@@ -3,9 +3,9 @@ using System.Collections;
 
 public class PointyLegs : MonoBehaviour {
 
-	public bool isRight = false;			// For determining which way the pointy legs is currently facing.	
+	public bool isRight;			// For determining which way the pointy legs is currently facing.	
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
-	public bool attacking = false;			// If pointy legs is currently swinging its arms to attack.
+	public bool attacking;			// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
@@ -15,13 +15,13 @@ public class PointyLegs : MonoBehaviour {
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
-	private Rigidbody2D rb;					// Reference to the Rigidbody2D component.
+	private Rigidbody2D rigid;					// Reference to the Rigidbody2D component.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 
 	void Awake () {
 		anim = GetComponent<Animator>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
-		rb = GetComponent<Rigidbody2D>();
+		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
 	}
 
@@ -47,9 +47,9 @@ public class PointyLegs : MonoBehaviour {
 		}		
 	}
 
-	void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag == "Fire")
-			TakeDamage(1000f);		//Instantly die if it touches fire	
+	private void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag.Equals("Fire"))
+			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
 	}
 
 	void Move () {
@@ -79,8 +79,8 @@ public class PointyLegs : MonoBehaviour {
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
 			AudioSource.PlayClipAtPoint(deathClip, transform.position);
-			rb.Sleep();
-			rb.constraints = RigidbodyConstraints2D.FreezeAll;
+			rigid.Sleep();
+			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
 			GetComponent<PolygonCollider2D>().enabled = false;
 			enabled = false;
 		} else {

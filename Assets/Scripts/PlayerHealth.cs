@@ -7,7 +7,7 @@ using System;
 public class PlayerHealth : MonoBehaviour {
 	public readonly float HEALTH = 10f;		// The player's health maximum.
 	[HideInInspector]			
-	public float currentH;					// The player's current health.
+	private float currentH;					// The player's current health.
 	[HideInInspector]
 	public bool isDead = false;				// If the player is dead.
 
@@ -32,11 +32,11 @@ public class PlayerHealth : MonoBehaviour {
 	}
 	
 	public void TakeDamage (float damageAmount) {
-		if (damageAmount == 1000 && !isDead)
+		if (damageAmount == 1000 && !isDead)	//Fire
 			Die();
 		else if (!playerCtrl.isGhost && !isDead) {
 			currentH -= damageAmount;
-			playerCtrl.helmetLight.intensity -= 0.2f;
+			//playerCtrl.helmetLight.intensity -= 0.2f;
 			GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 0), ForceMode2D.Impulse);
 			if (currentH <= 0f) {
 				Die();
@@ -85,10 +85,18 @@ public class PlayerHealth : MonoBehaviour {
     	playerCtrl.helmetLight.intensity = 1.5f;
     	// Loop through all the pointy legs in the scene and reset their positions.
     	int	j = positions.pointyStart; 
+    	print(j);
     	for (int i=0; i<positions.pointy.Length; i++) {
 	    	GameObject.FindWithTag("PointyLegs" + j).transform.position = positions.pointy[i];
 	    	if (GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health > 0f)
 	    		GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health = 45f;
+	    	j++;
+	    }
+	    j = positions.fourEyesStart;
+	    for (int i=0; i<positions.fourEyes.Length; i++) {
+	    	GameObject.FindWithTag("FourEyes" + j).transform.position = positions.fourEyes[i];
+	    	if (GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health > 0f)
+	    		GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health = 45f;
 	    	j++;
 	    }
     }

@@ -82,12 +82,11 @@ public class PlayerControl : MonoBehaviour {
 		helmetLight.intensity = 4;
 		GetComponent<AudioSource>().pitch = 3f;
 		maxSpeed = 3f;
+		rigid.velocity = new Vector2(rigid.velocity.x, 0);		// Alllows you to stop in the mid air.
 		StartCoroutine(GhostTime());
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Fire"))
-			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
 		if (col.gameObject.tag.Contains("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
 			//If right door move to next scene, if left move to previous
 			int i = Application.loadedLevel;
@@ -98,6 +97,11 @@ public class PlayerControl : MonoBehaviour {
 			else if (facing.Contains("Left"))
 				Application.LoadLevel(i - 1);
 		}
+	}
+
+	private void OnTriggerEnter2D (Collider2D col) {
+		if (col.gameObject.tag.Equals("Fire"))
+			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
 	}
 
 	private void Flip () {
