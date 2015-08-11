@@ -19,6 +19,7 @@ public class PlayerControl : MonoBehaviour {
 	private Lift lift;						// Reference to the Lift script.
 
 	private void Awake () {
+		DontDestroyOnLoad(transform.gameObject);
 		helmet = GameObject.FindGameObjectWithTag("Helmetlight").transform;
 		helmetLight = GameObject.FindGameObjectWithTag("Helmetlight").GetComponent<Light>();
 		anim = GetComponent<Animator>();
@@ -32,8 +33,8 @@ public class PlayerControl : MonoBehaviour {
 
 	private void Update () {
 	    if (Input.GetButtonDown("Fire2") && allowedToGhost && lift.allowedToBeam) {
-	    	//fullPathHash gets the current animation clip
-			//Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting
+	    	// fullPathHash gets the current animation clip
+			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting
 	    	if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314 && rigid.gravityScale == 1.8f) {
 	    		allowedToGhost = false;
 	    		Ghost();  
@@ -56,9 +57,9 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void Physics (float h) {
-		//fullPathHash gets the current animation clip
-		//Makes sure that the player is not in the shooting animation (left or right) before moving
-		if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314 && !isBeam) {
+		// fullPathHash gets the current animation clip
+		// Makes sure that the player is not in the shooting animation (left or right) before moving
+		if (!isBeam && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314) {
 			// If the player is changing direction (h has a different sign to velocity.x) or hasn't reached maxSpeed yet
 			if (h * rigid.velocity.x < maxSpeed)
 				rigid.AddForce(Vector2.right * h * MOVEFORCE);
@@ -87,21 +88,16 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Contains("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
-			//If right door move to next scene, if left move to previous
-			int i = Application.loadedLevel;
-			//Get the name of the door's sprite
-			string facing = GameObject.FindWithTag(col.gameObject.tag).GetComponent<SpriteRenderer>().sprite.ToString();
-			if (facing.Contains("Right"))
-				Application.LoadLevel(i + 1);
-			else if (facing.Contains("Left"))
-				Application.LoadLevel(i - 1);
+		if (col.gameObject.tag.Equals("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
+			// If right door move to next scene, if left move to previous
+			int level = Application.loadedLevel;
+			Application.LoadLevel(level + 1);
 		}
 	}
 
 	private void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
-			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
+			playerH.TakeDamage(1000f, false, false);		// Instantly die if you touch fire
 	}
 
 	private void Flip () {

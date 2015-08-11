@@ -11,8 +11,8 @@ public class Activate : MonoBehaviour {
 
 	private void Awake () {
 		accessLight = GetComponent<Light>();
-		char i = transform.tag[transform.tag.Length-1];
-		doorLight = GameObject.FindGameObjectWithTag("Door"+i).GetComponent<Light>();
+		//char i = transform.tag[transform.tag.Length-1];
+		doorLight = GameObject.FindGameObjectWithTag("Door").GetComponent<Light>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}
 	

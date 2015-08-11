@@ -3,9 +3,9 @@ using System.Collections;
 
 public class PointyLegs : MonoBehaviour {
 
-	public bool isRight;			// For determining which way the pointy legs is currently facing.	
+	public bool isRight;					// For determining which way the pointy legs is currently facing.	
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
-	public bool attacking;			// If pointy legs is currently swinging its arms to attack.
+	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
@@ -15,7 +15,7 @@ public class PointyLegs : MonoBehaviour {
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
-	private Rigidbody2D rigid;					// Reference to the Rigidbody2D component.
+	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 
 	void Awake () {
@@ -49,12 +49,12 @@ public class PointyLegs : MonoBehaviour {
 
 	private void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
-			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
+			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
 
 	void Move () {
 		float h;
-		//If a Poiny Legs is to the left or right of a hero
+		// If a Poiny Legs is to the left or right of a hero
 		if (playerPos.x > transform.position.x)
 			h = 1f;
 		else
@@ -75,7 +75,7 @@ public class PointyLegs : MonoBehaviour {
 
 	public void TakeDamage (float damageAmount) {
 		health -= damageAmount;
-		//When it dies disable all unneeded game objects and switch to death animation/sprite
+		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
 			AudioSource.PlayClipAtPoint(deathClip, transform.position);
@@ -88,17 +88,17 @@ public class PointyLegs : MonoBehaviour {
 		}
 	}
 
-	//Wait to attack again.
+	// Wait to attack again.
 	private IEnumerator WaitToAttack () {
         allowedToAttack = false;
         yield return new WaitForSeconds(3f);
         allowedToAttack = true;
     }
 
-    //Allows you to dodge the attack
+    // Allows you to dodge the attack
     private IEnumerator PlayerHurt () {
     	yield return new WaitForSeconds(0.32f);
     	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.4f)
-    		playerH.TakeDamage(10f);
+    		playerH.TakeDamage(10f, true, isRight);
     }
 }

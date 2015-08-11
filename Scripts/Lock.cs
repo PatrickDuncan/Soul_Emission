@@ -9,6 +9,7 @@ public class Lock : MonoBehaviour {
 	private PlayerHealth playerH;		// Reference to the PlayerHealth script.
 
 	void Awake () {
+		DontDestroyOnLoad(transform.gameObject);
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 	}

@@ -8,11 +8,13 @@ public class FourEyes : MonoBehaviour {
 	public bool hasFallen;					// For determining if the four eyes has fallen down.	
 	public bool allowedToMove;				// For determining if the four eyes is allowed to move.	
 	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
+	public bool allowedToDestroy;			// If the bullet can be destroyed when collided.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 0.35f;	// The fastest the player can travel in the x axis.
 	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when four eyes meets its end.
+	public AudioClip fallClip;				// CLip for when four eyes hits the ground.
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
@@ -47,19 +49,19 @@ public class FourEyes : MonoBehaviour {
 	private void OnCollisionStay2D (Collision2D col) {
 		if (allowedToAttack && col.gameObject.tag.Equals("Player")) {
 			allowedToAttack = false;
-			playerH.TakeDamage(1f);
+			playerH.TakeDamage(1f, false, false);
 			StartCoroutine(WaitToAttack());
 		}
 	}
 
 	private void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
-			playerH.TakeDamage(1000f);		//Instantly die if you touch fire
+			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
 
 	private void Move () {
 		float h;
-		//If a Poiny Legs is to the left or right of a hero
+		// If a Poiny Legs is to the left or right of a hero
 		if (playerPos.x > transform.position.x)
 			h = 1f;
 		else
@@ -80,7 +82,7 @@ public class FourEyes : MonoBehaviour {
 
 	public void TakeDamage (float damageAmount) {
 		health -= damageAmount;
-		//When it dies disable all unneeded game objects and switch to death animation/sprite
+		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
 			try {
@@ -97,21 +99,23 @@ public class FourEyes : MonoBehaviour {
 		}
 	}
 
-	//Wait to attack again.
+	public void CanShoot () {
+		allowedToDestroy = true;
+	}
+
+	// Wait to attack again.
 	private IEnumerator WaitToAttack () {
         yield return new WaitForSeconds(0.5f);
         allowedToAttack = true;
     }
 
-    //Allows you to dodge the attack
-    private IEnumerator PlayerHurt () {
-    	yield return new WaitForSeconds(0.32f);
-    	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.4f)
-    		playerH.TakeDamage(10f);
-    }
-
     private IEnumerator WaitForFall () {
     	yield return new WaitForSeconds(0.75f);
+    	try {
+			AudioSource.PlayClipAtPoint(deathClip, transform.position);
+		} catch (Exception e) {
+			print(e);
+		} 
     	allowedToMove = true;
 		GetComponent<PolygonCollider2D>().enabled = true;
 		anim.SetTrigger("Drop");

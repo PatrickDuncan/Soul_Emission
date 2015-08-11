@@ -5,11 +5,11 @@ using System.IO;
 using System;
 
 public class PlayerHealth : MonoBehaviour {
-	public readonly float HEALTH = 10f;		// The player's health maximum.
+	public readonly float HEALTH = 50f;		// The player's health maximum.
 	[HideInInspector]			
 	private float currentH;					// The player's current health.
 	[HideInInspector]
-	public bool isDead = false;				// If the player is dead.
+	public bool isDead;						// If the player is dead.
 
 	private Animator ripAnim;				// Reference to Rip's Animator
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer
@@ -22,26 +22,39 @@ public class PlayerHealth : MonoBehaviour {
 	public AudioClip deathClip;				// Clip for when the player dies.
 
 	private void Awake () {
-		ripAnim = GameObject.FindGameObjectWithTag("Rip").GetComponent<Animator>();
-		ripSprite = GameObject.FindGameObjectWithTag("Rip").GetComponent<SpriteRenderer>();
+		ripAnim = GameObject.FindWithTag("Rip").GetComponent<Animator>();
+		ripSprite = GameObject.FindWithTag("Rip").GetComponent<SpriteRenderer>();
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
 		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
-		positions = GetComponent<Positions>();
+		positions = GameObject.FindWithTag("Background").GetComponent<Positions>();
 		currentH = HEALTH;
 	}
+
+	private void Start () {
+		ResetPosition();
+	}
 	
-	public void TakeDamage (float damageAmount) {
-		if (damageAmount == 1000 && !isDead)	//Fire
+	private void OnLevelWasLoaded(int level) {
+        positions = GameObject.FindWithTag("Background").GetComponent<Positions>();
+        ResetPosition();
+    }
+
+	public void TakeDamage (float damageAmount, bool push, bool right) {
+		if (damageAmount == 1000 && !isDead)	// Fire
 			Die();
 		else if (!playerCtrl.isGhost && !isDead) {
 			currentH -= damageAmount;
-			//playerCtrl.helmetLight.intensity -= 0.2f;
-			GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 0), ForceMode2D.Impulse);
+			if (push && right)
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(10f, 0), ForceMode2D.Impulse);
+			else if (push && !right)
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 0), ForceMode2D.Impulse);
 			if (currentH <= 0f) {
 				Die();
-			} else
-				AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	//Only one sound when you die
+			} else {
+				AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	// Only one sound when you die
+				playerCtrl.helmetLight.intensity -= damageAmount/40;
+			}
 		}
 	}
 
@@ -71,33 +84,40 @@ public class PlayerHealth : MonoBehaviour {
     	gun.allowedToShoot = true;
     	playerCtrl.allowedToGhost = true;
     	ripSprite.enabled = false;
-    	ResetPositions();
+    	Reset();
     	ripAnim.enabled = false;
     	isDead = false;
 	}
 
-	//Reset the scene and bring the players HEALTH to half of the maximum
-	private void ResetPositions () {
+	// Reset the scene and bring the players HEALTH to half of the maximum
+	private void Reset () {
+		try {
+	    	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+	    	playerCtrl.helmetLight.intensity = 1.575f;
+	    	ResetPosition();
+	    	playerCtrl.resetHelmet();
+	    	// Loop through all the pointy legs in the scene and reset their positions.
+	    	int	j = positions.pointyStart; 
+	    	for (int i=0; i<positions.pointy.Length; i++) {
+		    	GameObject.FindWithTag("PointyLegs" + j).transform.position = positions.pointy[i];
+		    	if (GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health > 0f)
+		    		GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health = 45f;
+		    	j++;
+		    }
+		    j = positions.fourEyesStart;
+		    for (int i=0; i<positions.fourEyes.Length; i++) {
+		    	GameObject.FindWithTag("FourEyes" + j).transform.position = positions.fourEyes[i];
+		    	if (GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health > 0f)
+		    		GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health = 100f;
+		    	j++;
+		    }
+		} catch (Exception e) {
+			print(e);
+		}
+    }
+
+    public void ResetPosition () {
     	transform.position = positions.player;
-    	transform.rotation = Quaternion.Euler(0f, 0f, 0f);
     	playerCtrl.isRight = positions.isRight;
-    	playerCtrl.resetHelmet();
-    	playerCtrl.helmetLight.intensity = 1.5f;
-    	// Loop through all the pointy legs in the scene and reset their positions.
-    	int	j = positions.pointyStart; 
-    	print(j);
-    	for (int i=0; i<positions.pointy.Length; i++) {
-	    	GameObject.FindWithTag("PointyLegs" + j).transform.position = positions.pointy[i];
-	    	if (GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health > 0f)
-	    		GameObject.FindWithTag("PointyLegs" + j).GetComponent<PointyLegs>().health = 45f;
-	    	j++;
-	    }
-	    j = positions.fourEyesStart;
-	    for (int i=0; i<positions.fourEyes.Length; i++) {
-	    	GameObject.FindWithTag("FourEyes" + j).transform.position = positions.fourEyes[i];
-	    	if (GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health > 0f)
-	    		GameObject.FindWithTag("FourEyes" + j).GetComponent<FourEyes>().health = 45f;
-	    	j++;
-	    }
     }
 }
