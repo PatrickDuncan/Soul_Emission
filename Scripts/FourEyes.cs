@@ -20,12 +20,14 @@ public class FourEyes : MonoBehaviour {
 	private Transform player;				// Reference to the Player's transform.
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
 		anim = GetComponent<Animator>();
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
+		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
@@ -86,7 +88,7 @@ public class FourEyes : MonoBehaviour {
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
 			try {
-				AudioSource.PlayClipAtPoint(deathClip, transform.position);
+				custom.PlayClipAt(deathClip, transform.position);
 			} catch (Exception e) {
 				print(e);
 			} 
@@ -111,11 +113,7 @@ public class FourEyes : MonoBehaviour {
 
     private IEnumerator WaitForFall () {
     	yield return new WaitForSeconds(0.75f);
-    	try {
-			AudioSource.PlayClipAtPoint(deathClip, transform.position);
-		} catch (Exception e) {
-			print(e);
-		} 
+		custom.PlayClipAt(fallClip, transform.position);
     	allowedToMove = true;
 		GetComponent<PolygonCollider2D>().enabled = true;
 		anim.SetTrigger("Drop");

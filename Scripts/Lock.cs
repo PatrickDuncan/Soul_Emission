@@ -10,8 +10,8 @@ public class Lock : MonoBehaviour {
 
 	void Awake () {
 		DontDestroyOnLoad(transform.gameObject);
-		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		player = GameObject.FindGameObjectWithTag("Player").transform;
+		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
+		player = GameObject.FindWithTag("Player").transform;
 	}
 
 	void Update () {

@@ -13,23 +13,26 @@ public class Gun : MonoBehaviour {
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Transform component of Player.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
 		anim = transform.root.gameObject.GetComponent<Animator>();
-		player = GameObject.FindGameObjectWithTag("Player").transform;
+		player = GameObject.FindWithTag("Player").transform;
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
+		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void FixedUpdate () {
 		// Only able to shoot if the right input is pressed, the allowedToShoot boolean is true and the player is not a ghost.
 		if ((Input.GetButtonDown("Fire1") || (Input.touchCount == 1 && Input.touches[0].position.x > Screen.width/2 && Input.touches[0].position.y < Screen.height/2)) && allowedToShoot && !playerCtrl.isGhost) {
-			// ... set the animator Shoot trigger parameter and play the audioclip.
+			// Set the animator Shoot trigger parameter and play the audioclip.
 			allowedToShoot = false;
 			if (playerCtrl.isRight)
 				anim.SetTrigger("RightShoot");
 			else
 				anim.SetTrigger("LeftShoot");
-			AudioSource.PlayClipAtPoint(shootClip, transform.position);
+			custom.PlayClipAt(shootClip, transform.position);
+			// Derive the bullet's position from the player's position.
 			if (playerCtrl.isRight) {
 				position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);
 				Rigidbody2D bulletInstance = Instantiate(bullet, position, Quaternion.Euler(new Vector3(0,0,0))) as Rigidbody2D;
@@ -46,7 +49,7 @@ public class Gun : MonoBehaviour {
 
 	// You just shot the gun, wait to shoot again.
 	private IEnumerator Wait () {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(1.4f);
         allowedToShoot = true;
     }
 }

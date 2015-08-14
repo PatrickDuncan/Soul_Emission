@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using System.Collections;
 
 public class Lift : MonoBehaviour {		
@@ -9,18 +10,21 @@ public class Lift : MonoBehaviour {
 	private PolygonCollider2D poly;			// Reference to the player's polygon collider.
 	private Transform player;				// Reference to the player's transform.
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
-	private PlayerHealth playerH;			// Reference to the PlayerHl script.
+	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 	private Animator anim;					// Reference to the Animator component.
 	private Gun gun;						// Reference to the Gun class
+	public AudioClip liftClip;				// Clip for when the lift is activated.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
-		rigid = GameObject.FindGameObjectWithTag("Player").GetComponent<Rigidbody2D>();
-		poly = GameObject.FindGameObjectWithTag("Player").GetComponent<PolygonCollider2D>();
-		playerCtrl = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
-		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
-		player = GameObject.FindGameObjectWithTag("Player").transform;
+		rigid = GameObject.FindWithTag("Player").GetComponent<Rigidbody2D>();
+		poly = GameObject.FindWithTag("Player").GetComponent<PolygonCollider2D>();
+		playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerControl>();
+		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
+		gun = GameObject.FindWithTag("Gun").GetComponent<Gun>();
+		player = GameObject.FindWithTag("Player").transform;
 		anim = GetComponent<Animator>();
+		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	public void OnMouseDown () {
@@ -47,6 +51,7 @@ public class Lift : MonoBehaviour {
 			gun.allowedToShoot = false;
 			rigid.velocity = new Vector2(0, 0);	
 			StartCoroutine(WaitForBeam());
+			custom.PlayClipAt(liftClip, transform.position);
 		}
 	}
 

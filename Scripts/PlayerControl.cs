@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
+	
 	public bool isRight = true;				// For determining which way the player is currently facing.
 	public bool isGhost = false;			// For determining if the player is using ghost powers.
 	public bool allowedToGhost = true;		// For determining if the player is using ghost powers.
@@ -20,12 +21,12 @@ public class PlayerControl : MonoBehaviour {
 
 	private void Awake () {
 		DontDestroyOnLoad(transform.gameObject);
-		helmet = GameObject.FindGameObjectWithTag("Helmetlight").transform;
-		helmetLight = GameObject.FindGameObjectWithTag("Helmetlight").GetComponent<Light>();
+		helmet = GameObject.FindWithTag("Helmetlight").transform;
+		helmetLight = GameObject.FindWithTag("Helmetlight").GetComponent<Light>();
 		anim = GetComponent<Animator>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
-		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		lift = GameObject.FindGameObjectWithTag("Beam").GetComponent<Lift>();
+		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
+		lift = GameObject.FindWithTag("Beam").GetComponent<Lift>();
 		rigid = GetComponent<Rigidbody2D>();
 		if (!isRight)
 			resetHelmet();

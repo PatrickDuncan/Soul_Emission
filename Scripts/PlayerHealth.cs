@@ -5,6 +5,7 @@ using System.IO;
 using System;
 
 public class PlayerHealth : MonoBehaviour {
+
 	public readonly float HEALTH = 50f;		// The player's health maximum.
 	[HideInInspector]			
 	private float currentH;					// The player's current health.
@@ -17,17 +18,21 @@ public class PlayerHealth : MonoBehaviour {
 	private Animator anim;					// Reference to the Animator on the player.
 	private Gun gun;						// Reference to the Gun class.
 	private Positions positions;			// Reference to the Positions class.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	public AudioClip injuryClip;			// Clip for when the player gets injured.
 	public AudioClip deathClip;				// Clip for when the player dies.
+	public AudioClip kissClip;				// Normal background song
+	public AudioClip expanseClip;			// Secondary background song
 
 	private void Awake () {
 		ripAnim = GameObject.FindWithTag("Rip").GetComponent<Animator>();
 		ripSprite = GameObject.FindWithTag("Rip").GetComponent<SpriteRenderer>();
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
-		gun = GameObject.FindGameObjectWithTag("Gun").GetComponent<Gun>();
+		gun = GameObject.FindWithTag("Gun").GetComponent<Gun>();
 		positions = GameObject.FindWithTag("Background").GetComponent<Positions>();
+		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
 		currentH = HEALTH;
 	}
 
@@ -38,6 +43,11 @@ public class PlayerHealth : MonoBehaviour {
 	private void OnLevelWasLoaded(int level) {
         positions = GameObject.FindWithTag("Background").GetComponent<Positions>();
         ResetPosition();
+        if (level == 2)
+        	GetComponent<AudioSource>().clip = expanseClip;
+        else
+        	GetComponent<AudioSource>().clip = kissClip;
+        GetComponent<AudioSource>().Play();
     }
 
 	public void TakeDamage (float damageAmount, bool push, bool right) {
@@ -52,7 +62,7 @@ public class PlayerHealth : MonoBehaviour {
 			if (currentH <= 0f) {
 				Die();
 			} else {
-				AudioSource.PlayClipAtPoint(injuryClip, transform.position); 	// Only one sound when you die
+				custom.PlayClipAt(injuryClip, transform.position); 	// Only one sound when you die
 				playerCtrl.helmetLight.intensity -= damageAmount/40;
 			}
 		}
@@ -66,7 +76,7 @@ public class PlayerHealth : MonoBehaviour {
 			anim.SetTrigger("DeathRight");
 		else
 			anim.SetTrigger("DeathLeft");
-		AudioSource.PlayClipAtPoint(deathClip, transform.position);
+		custom.PlayClipAt(deathClip, transform.position);
 		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 		playerCtrl.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
 		gun.allowedToShoot = false;

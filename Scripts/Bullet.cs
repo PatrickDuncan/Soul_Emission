@@ -9,7 +9,7 @@ public class Bullet : MonoBehaviour {
 	
 	private void OnTriggerEnter2D (Collider2D col) {
 		string tag = col.gameObject.tag;
-		if (tag == "Background") 
+		if (tag.Equals("Background") || tag.Contains("Access") || tag.Contains("Door") || tag.Contains("Ground"))
 			Destroy(gameObject);
 		else if (tag.Contains("PointyLegs") && !GameObject.FindWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger) {
 			GameObject.FindWithTag(tag).GetComponent<PointyLegs>().TakeDamage(10f);

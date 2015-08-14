@@ -17,26 +17,28 @@ public class PointyLegs : MonoBehaviour {
 	private Transform player;				// Reference to the Player's transform.
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
-	void Awake () {
+	private void Awake () {
 		anim = GetComponent<Animator>();
-		player = GameObject.FindGameObjectWithTag("Player").transform;
+		player = GameObject.FindWithTag("Player").transform;
 		rigid = GetComponent<Rigidbody2D>();
-		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
+		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
+		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
-	void Update () {
+	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
 		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
 			Flip();
-		if (allowedToAttack && !playerH.isDead && Mathf.Abs(playerPos.x - transform.position.x) < 2.4f && Mathf.Abs(playerPos.y - transform.position.y) < 1f) {
+		if (allowedToAttack && !playerH.isDead && Mathf.Abs(playerPos.x - transform.position.x) < 2.8f && Mathf.Abs(playerPos.y - transform.position.y) < 2f) {
 			anim.SetTrigger("Attack");
 			attacking = true;
 			StartCoroutine(PlayerHurt());
 			StartCoroutine(WaitToAttack());
-			AudioSource.PlayClipAtPoint(swingClip, transform.position);
+			custom.PlayClipAt(swingClip, transform.position);
 		}
-		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.4f  && Mathf.Abs(playerPos.y - transform.position.y) < 2f) {
+		else if (allowedToAttack && Mathf.Abs(playerPos.x - transform.position.x) > 2.8f  && Mathf.Abs(playerPos.y - transform.position.y) < 2f) {
 			anim.SetTrigger("Walk");
 			attacking = false;
 			Move();
@@ -52,7 +54,7 @@ public class PointyLegs : MonoBehaviour {
 			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
 
-	void Move () {
+	private void Move () {
 		float h;
 		// If a Poiny Legs is to the left or right of a hero
 		if (playerPos.x > transform.position.x)
@@ -66,7 +68,7 @@ public class PointyLegs : MonoBehaviour {
 			GetComponent<Rigidbody2D>().velocity = new Vector2(Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) * MAXSPEED, GetComponent<Rigidbody2D>().velocity.y);
 	}
 
-	void Flip () {
+	private void Flip () {
 		isRight = !isRight;
 		Vector3 theScale = transform.localScale;
 		theScale.x *= -1;
@@ -78,7 +80,7 @@ public class PointyLegs : MonoBehaviour {
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");
-			AudioSource.PlayClipAtPoint(deathClip, transform.position);
+			custom.PlayClipAt(deathClip, transform.position);
 			rigid.Sleep();
 			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
 			GetComponent<PolygonCollider2D>().enabled = false;
@@ -98,7 +100,7 @@ public class PointyLegs : MonoBehaviour {
     // Allows you to dodge the attack
     private IEnumerator PlayerHurt () {
     	yield return new WaitForSeconds(0.32f);
-    	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.4f)
+    	if (Mathf.Abs(playerPos.x - transform.position.x) < 2.8f)
     		playerH.TakeDamage(10f, true, isRight);
     }
 }
