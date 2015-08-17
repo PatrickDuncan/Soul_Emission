@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 
+// In the Background object because it will always be loaded in every level/scene.
 public class Positions : MonoBehaviour {
 
 	private string playerPos;		// All the positions for the player.

@@ -21,10 +21,10 @@ public class Lift : MonoBehaviour {
 		poly = GameObject.FindWithTag("Player").GetComponent<PolygonCollider2D>();
 		playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerControl>();
 		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		gun = GameObject.FindWithTag("Gun").GetComponent<Gun>();
+		gun = GameObject.Find("Gun").GetComponent<Gun>();
 		player = GameObject.FindWithTag("Player").transform;
 		anim = GetComponent<Animator>();
-		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	public void OnMouseDown () {

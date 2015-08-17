@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 
 public class PlayerControl : MonoBehaviour {
@@ -7,6 +7,7 @@ public class PlayerControl : MonoBehaviour {
 	public bool isGhost = false;			// For determining if the player is using ghost powers.
 	public bool allowedToGhost = true;		// For determining if the player is using ghost powers.
 	public bool isBeam = false;				// If the player is using the beam.
+	public bool isNormal = true;			// If the player's layer mask is not Ghost;
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	private float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
@@ -20,9 +21,8 @@ public class PlayerControl : MonoBehaviour {
 	private Lift lift;						// Reference to the Lift script.
 
 	private void Awake () {
-		DontDestroyOnLoad(transform.gameObject);
-		helmet = GameObject.FindWithTag("Helmetlight").transform;
-		helmetLight = GameObject.FindWithTag("Helmetlight").GetComponent<Light>();
+		helmet = GameObject.Find("HelmetLight").transform;
+		helmetLight = GameObject.Find("HelmetLight").GetComponent<Light>();
 		anim = GetComponent<Animator>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
 		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
@@ -33,13 +33,18 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void Update () {
-	    if (Input.GetButtonDown("Fire2") && allowedToGhost && lift.allowedToBeam) {
-	    	// fullPathHash gets the current animation clip
-			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting
+	    if (Input.GetButtonDown("Ghost") && allowedToGhost && lift.allowedToBeam) {
+	    	// fullPathHash gets the current animation clip.
+			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
 	    	if (anim.GetCurrentAnimatorStateInfo(0).fullPathHash != 485325471 && anim.GetCurrentAnimatorStateInfo(0).fullPathHash != -1268868314 && rigid.gravityScale == 1.8f) {
 	    		allowedToGhost = false;
 	    		Ghost();  
 	    	}
+	    }
+	    // Stops glitch where the player would get stuck above the enemy after ghost mode.
+	    if (!isGhost && !isNormal && EnemiesFarAway()) {
+	    	isNormal = true;
+	    	gameObject.layer = LayerMask.NameToLayer("Default");
 	    }
 	}
 
@@ -47,7 +52,7 @@ public class PlayerControl : MonoBehaviour {
 		if (!playerH.isDead) {
 			float h = Input.GetAxis("Horizontal");
 			Physics(h);
-			//Touch Input
+			// Touch Input
 			if (Input.touchCount == 1 && Input.touches[0].position.x < Screen.width/2 && Input.touches[0].position.y < Screen.height/2) {
 		     	if (Input.touches[0].position.x < Screen.width/4)
 		     		Physics(-1);	         	
@@ -55,6 +60,22 @@ public class PlayerControl : MonoBehaviour {
 		         	Physics(1);  	
 		    }
 		}
+	}
+
+	private bool EnemiesFarAway () {
+		// Loops through all enemies to make sure that they're not colliding (by comparing the x values).
+		foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
+			if (!isRight && enemy.name.Equals("Pointy Legs")) {
+				// Return false if any one enemy is too close.
+				if (Mathf.Abs(enemy.transform.position.x - transform.position.x) < 2.2f && Mathf.Abs(enemy.transform.position.y - transform.position.y) < 2f)
+					return false;
+			} 
+			else {
+				if (Mathf.Abs(enemy.transform.position.x - transform.position.x) < 3.6f && Mathf.Abs(enemy.transform.position.y - transform.position.y) < 2f)
+					return false;
+			}
+		}
+		return true;
 	}
 
 	private void Physics (float h) {
@@ -80,6 +101,7 @@ public class PlayerControl : MonoBehaviour {
 			anim.SetTrigger("GhostLeft");
 		rigid.gravityScale = 0f;
 		gameObject.layer = LayerMask.NameToLayer("Ghost");
+		isNormal = false;
 		previousIntensity = helmetLight.intensity;
 		helmetLight.intensity = 4;
 		GetComponent<AudioSource>().pitch = 3f;
@@ -89,7 +111,7 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Door") && GameObject.FindGameObjectWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
+		if (col.gameObject.tag.Equals("Door") && GameObject.FindWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
 			// If right door move to next scene, if left move to previous
 			int level = Application.loadedLevel;
 			Application.LoadLevel(level + 1);
@@ -139,7 +161,7 @@ public class PlayerControl : MonoBehaviour {
 
 	public void BackToNormal () {
 		rigid.gravityScale = 1.8f;
-    	gameObject.layer = LayerMask.NameToLayer("Default");
+    	
     	GetComponent<AudioSource>().pitch = 0.4f;
     	helmetLight.intensity = previousIntensity;
 		isGhost = false;

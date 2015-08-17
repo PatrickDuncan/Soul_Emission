@@ -24,7 +24,7 @@ public class PointyLegs : MonoBehaviour {
 		player = GameObject.FindWithTag("Player").transform;
 		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {

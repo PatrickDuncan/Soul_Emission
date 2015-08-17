@@ -27,7 +27,7 @@ public class FourEyes : MonoBehaviour {
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {

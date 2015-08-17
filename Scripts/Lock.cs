@@ -8,13 +8,12 @@ public class Lock : MonoBehaviour {
 	private Transform player;			// Reference to the player.
 	private PlayerHealth playerH;		// Reference to the PlayerHealth script.
 
-	void Awake () {
-		DontDestroyOnLoad(transform.gameObject);
+	private void Awake () {
 		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
 		player = GameObject.FindWithTag("Player").transform;
 	}
 
-	void Update () {
+	private void Update () {
 		// Set the position to the player's position with the offset.
 		if (!playerH.isDead) { 
 			transform.position = player.position - SHIFT;	

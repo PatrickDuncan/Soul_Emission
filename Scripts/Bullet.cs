@@ -8,15 +8,15 @@ public class Bullet : MonoBehaviour {
 	}
 	
 	private void OnTriggerEnter2D (Collider2D col) {
-		string tag = col.gameObject.tag;
-		if (tag.Equals("Background") || tag.Contains("Access") || tag.Contains("Door") || tag.Contains("Ground"))
+		string tag = col.gameObject.name;
+		if (tag.Equals("Background") || tag.Contains("Access") || tag.Contains("Door") || tag.Contains("floor"))
 			Destroy(gameObject);
-		else if (tag.Contains("PointyLegs") && !GameObject.FindWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger) {
-			GameObject.FindWithTag(tag).GetComponent<PointyLegs>().TakeDamage(10f);
+		else if (tag.Contains("Pointy Legs") && !GameObject.Find(tag).GetComponent<PolygonCollider2D>().isTrigger) {
+			GameObject.Find(tag).GetComponent<PointyLegs>().TakeDamage(7f);
 			Destroy(gameObject);
 		}
-		else if (tag.Contains("FourEyes") && !GameObject.FindWithTag(tag).GetComponent<PolygonCollider2D>().isTrigger && GameObject.FindWithTag(tag).GetComponent<FourEyes>().allowedToDestroy) {
-			GameObject.FindWithTag(tag).GetComponent<FourEyes>().TakeDamage(10f);
+		else if (tag.Contains("Four Eyes") && !GameObject.Find(tag).GetComponent<PolygonCollider2D>().isTrigger && GameObject.Find(tag).GetComponent<FourEyes>().allowedToDestroy) {
+			GameObject.Find(tag).GetComponent<FourEyes>().TakeDamage(7f);
 			Destroy(gameObject);
 		}
 	}

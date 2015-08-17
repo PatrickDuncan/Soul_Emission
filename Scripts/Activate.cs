@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Activate : MonoBehaviour {
 
@@ -15,7 +14,7 @@ public class Activate : MonoBehaviour {
 		//char i = transform.tag[transform.tag.Length-1];
 		doorLight = GameObject.FindWithTag("Door").GetComponent<Light>();
 		player = GameObject.FindWithTag("Player").transform;
-		custom = GameObject.FindWithTag("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
 	}
 	
 	private void OnMouseDown () {
