@@ -2,7 +2,6 @@ using UnityEngine;
 using System.Collections;
 
 public class ToCamera : MonoBehaviour {
-	
 	private new Transform camera;			//Reference the Main Camera's transform
 
 	private void Awake () {
@@ -10,7 +9,7 @@ public class ToCamera : MonoBehaviour {
 	}
 
 	private void OnLevelWasLoaded(int level) {
-        camera = GameObject.FindWithTag("MainCamera").transform;
+        camera = GameObject.FindWithTag("MainCamera").transform;	// Brings object to the camera when level is loaded.
     }
 
 	private void Update () {

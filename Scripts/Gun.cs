@@ -19,12 +19,12 @@ public class Gun : MonoBehaviour {
 		anim = transform.root.gameObject.GetComponent<Animator>();
 		player = GameObject.FindWithTag("Player").transform;
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
-		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void FixedUpdate () {
 		// Only able to shoot if the right input is pressed, the allowedToShoot boolean is true and the player is not a ghost.
-		if ((Input.GetButtonDown("Shoot") || (Input.touchCount == 1 && Input.touches[0].position.x > Screen.width/2 && Input.touches[0].position.y < Screen.height/2)) && allowedToShoot && !playerCtrl.isGhost) {
+		if (allowedToShoot && !playerCtrl.isGhost && Input.GetButtonDown("Shoot") || TouchShoot()) {
 			// Set the animator Shoot trigger parameter and play the audioclip.
 			allowedToShoot = false;
 			if (playerCtrl.isRight)
@@ -45,6 +45,10 @@ public class Gun : MonoBehaviour {
 			}
 			StartCoroutine(Wait());
 		}
+	}
+
+	private bool TouchShoot () {
+		return (Input.touchCount == 1 && Input.touches[0].position.x > Screen.width/2 && Input.touches[0].position.y < Screen.height/2);
 	}
 
 	// You just shot the gun, wait to shoot again.

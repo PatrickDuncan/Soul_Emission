@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System;
 
-public class FourEyes : MonoBehaviour {
+public class FourEyes : MonoBehaviour, IEnemy {
 
 	public bool isRight;					// For determining which way the four eyes is currently facing.	
 	public bool hasFallen;					// For determining if the four eyes has fallen down.	
@@ -27,23 +27,26 @@ public class FourEyes : MonoBehaviour {
 		player = GameObject.FindGameObjectWithTag("Player").transform;
 		rigid = GetComponent<Rigidbody2D>();
 		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
 		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
 			Flip();
-		if (allowedToMove && hasFallen && !playerH.isDead && Mathf.Abs(playerPos.y - transform.position.y) < 5f) {
+		if (allowedToMove && hasFallen && !playerH.isDead && Functions.DeltaMax(playerPos.y, transform.position.y, 5f)) {
 			anim.SetTrigger("Walk");
 			Move();
 		}
-		else if (!hasFallen && Mathf.Abs(playerPos.x - transform.position.x) < 13f  && playerPos.y < transform.position.y && Mathf.Abs(playerPos.y - transform.position.y) < 5f) {
-			hasFallen = true;
-			rigid.gravityScale = 1.8f;
-			StartCoroutine(WaitForFall());
+		// The player has to be under it, but there must be a limit to the y because it has to drop when the player is on the same floor.
+		else if (!hasFallen && Functions.DeltaMax(playerPos.x, transform.position.x, 13f)) {
+			if (playerPos.y < transform.position.y && Functions.DeltaMax(playerPos.y, transform.position.y, 5f)) {
+				hasFallen = true;
+				rigid.gravityScale = 1.8f;
+				StartCoroutine(WaitForFall());
+			}
 		}
-		else if (!allowedToMove && !hasFallen && Mathf.Abs(playerPos.y - transform.position.y) >= 10f){
+		else if (!allowedToMove && !hasFallen && Functions.DeltaMin(playerPos.y, transform.position.y, 10f)) {
 			anim.SetTrigger("Idle");
 		}		
 	}
@@ -56,23 +59,23 @@ public class FourEyes : MonoBehaviour {
 		}
 	}
 
-	private void OnTriggerEnter2D (Collider2D col) {
+	public void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
 			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
 
 	private void Move () {
-		float h;
-		// If a Poiny Legs is to the left or right of a hero
+		float sign;
+		// If it is to the left or right of a hero
 		if (playerPos.x > transform.position.x)
-			h = 1f;
+			sign = 1f;
 		else
-			h = -1f; 
-		if (h * GetComponent<Rigidbody2D>().velocity.x < MAXSPEED)
-			GetComponent<Rigidbody2D>().AddForce(Vector2.right * h * MOVEFORCE);
-		if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) > MAXSPEED)
+			sign = -1f; 
+		if (sign * rigid.velocity.x < MAXSPEED)
+			rigid.AddForce(Vector2.right * sign * MOVEFORCE);
+		if (Mathf.Abs(rigid.velocity.x) > MAXSPEED)
 			// ... set the player's velocity to the MAXSPEED in the x axis.
-			GetComponent<Rigidbody2D>().velocity = new Vector2(Mathf.Sign(GetComponent<Rigidbody2D>().velocity.x) * MAXSPEED, GetComponent<Rigidbody2D>().velocity.y);
+			rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * MAXSPEED, rigid.velocity.y);
 	}
 
 	private void Flip () {
@@ -82,8 +85,8 @@ public class FourEyes : MonoBehaviour {
 		transform.localScale = theScale;
 	}
 
-	public void TakeDamage (float damageAmount) {
-		health -= damageAmount;
+	public void TakeDamage (float damage) {
+		health -= damage;
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");

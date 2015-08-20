@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.Audio;
 using System.Collections;
 
 public class Lift : MonoBehaviour {		
@@ -12,7 +11,7 @@ public class Lift : MonoBehaviour {
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 	private Animator anim;					// Reference to the Animator component.
-	private Gun gun;						// Reference to the Gun class
+	private Gun gun;						// Reference to the Gun class.
 	public AudioClip liftClip;				// Clip for when the lift is activated.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
@@ -24,7 +23,7 @@ public class Lift : MonoBehaviour {
 		gun = GameObject.Find("Gun").GetComponent<Gun>();
 		player = GameObject.FindWithTag("Player").transform;
 		anim = GetComponent<Animator>();
-		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	public void OnMouseDown () {
@@ -35,7 +34,7 @@ public class Lift : MonoBehaviour {
 		Beam();
 	}
 
-	private void Beam() {
+	private void Beam () {
 		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost && !playerH.isDead) {
 			allowedToBeam = false;
 			playerCtrl.isBeam = true;
@@ -55,7 +54,7 @@ public class Lift : MonoBehaviour {
 		}
 	}
 
-	private void OnTriggerExit2D(Collider2D col) {
+	private void OnTriggerExit2D (Collider2D col) {
 		if (!allowedToBeam) {
 			rigid.gravityScale = 1.8f;
 			poly.isTrigger = false;

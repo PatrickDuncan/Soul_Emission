@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using System;
-using System.Collections;
 
 public class CustomPlayClipAtPoint : MonoBehaviour {
 

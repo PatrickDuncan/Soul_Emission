@@ -14,7 +14,7 @@ public class Activate : MonoBehaviour {
 		//char i = transform.tag[transform.tag.Length-1];
 		doorLight = GameObject.FindWithTag("Door").GetComponent<Light>();
 		player = GameObject.FindWithTag("Player").transform;
-		custom = GameObject.Find("Background").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 	
 	private void OnMouseDown () {
@@ -26,7 +26,7 @@ public class Activate : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Mathf.Abs(player.position.x - transform.position.x) < 5f && Mathf.Abs(player.position.y - transform.position.y) < 2f) { 
+		if (Functions.DeltaMax(player.position.x, transform.position.x, 5f) && Functions.DeltaMax(player.position.y, transform.position.y, 2f)) { 
 			accessLight.enabled = !accessLight.enabled;
 		 	doorLight.enabled = !doorLight.enabled;
 			custom.PlayClipAt(activateClip, transform.position);

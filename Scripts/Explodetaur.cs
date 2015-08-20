@@ -1,17 +1,17 @@
 using UnityEngine;
 using System.Collections;
 
-public class PointyLegs : MonoBehaviour {
+public class Explodetaur : MonoBehaviour, IEnemy {
 
-	public bool isRight;					// For determining which way the pointy legs is currently facing.	
-	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
-	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
-	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
-	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
+	public bool isRight;					// For determining which way the explodetaur is currently facing.	
+	private bool allowedToAttack = true;	// If explodetaur is allowed to attack.
+	public bool attacking;					// If explodetaur is currently swinging its arms to attack.
+	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
+	private readonly float MAXSPEED = 2f;	// The fastest the player can travel in the x axis.
+	public float health = 14f;				// The health points for this instance of the explodetaur prefab.
 	private Vector2 playerPos;				// The player's position.
-	public AudioClip swingClip;				// Clip for when pointy legs attacks.
-	public AudioClip deathClip;				// CLip for when pointy legs meets its end.
+	public AudioClip swingClip;				// Clip for when explodetaur attacks.
+	public AudioClip deathClip;				// CLip for when explodetaur meets its end.
 
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
@@ -49,7 +49,7 @@ public class PointyLegs : MonoBehaviour {
 		}		
 	}
 
-	private void OnTriggerEnter2D (Collider2D col) {
+	public void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
 			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
@@ -75,8 +75,8 @@ public class PointyLegs : MonoBehaviour {
 		transform.localScale = theScale;
 	}
 
-	public void TakeDamage (float damageAmount) {
-		health -= damageAmount;
+	public void TakeDamage (float damage) {
+		health -= damage;
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
 			anim.SetTrigger("Death");

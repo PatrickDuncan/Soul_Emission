@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 
 // In the Background object because it will always be loaded in every level/scene.
@@ -22,10 +21,19 @@ public class Positions : MonoBehaviour {
 		pointyPos = asset.text;
 		asset = Resources.Load("fourEyesPos") as TextAsset;
 		fourEyesPos = asset.text;
+
+		GetPositions();
+	}
+
+	private void OnLevelWasLoaded () {
+		GetPositions();
+	}
+
+	private void GetPositions () {
+		pointyStart = fourEyesStart = 1;
 		player = computePlayer();
 		pointy = new Vector3[0];
 		fourEyes = new Vector3[0];
-		pointyStart = fourEyesStart = 1;
 		pointy = compute(pointy, pointyPos, "pointy");
 		fourEyes = compute(fourEyes, fourEyesPos, "fourEyes");
 	}
