@@ -7,14 +7,16 @@ public class Activate : MonoBehaviour {
 	private Transform player;				// Reference to the player's transform.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
+	private Transform theTransform;			// Reference to the Transform.
 	public AudioClip activateClip;			// Clip for when the player shoots.
 
-	private void Awake () {
+	private void Start () {
+		theTransform = transform;
 		accessLight = GetComponent<Light>();
 		//char i = transform.tag[transform.tag.Length-1];
 		doorLight = GameObject.FindWithTag("Door").GetComponent<Light>();
 		player = GameObject.FindWithTag("Player").transform;
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 	
 	private void OnMouseDown () {
@@ -26,10 +28,10 @@ public class Activate : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Functions.DeltaMax(player.position.x, transform.position.x, 5f) && Functions.DeltaMax(player.position.y, transform.position.y, 2f)) { 
+		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 5f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) { 
 			accessLight.enabled = !accessLight.enabled;
 		 	doorLight.enabled = !doorLight.enabled;
-			custom.PlayClipAt(activateClip, transform.position);
+			custom.PlayClipAt(activateClip, theTransform.position);
 		}
 	}		
 }

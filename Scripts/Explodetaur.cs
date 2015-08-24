@@ -1,18 +1,19 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class Explodetaur : MonoBehaviour, IEnemy {
 
 	public bool isRight;					// For determining which way the explodetaur is currently facing.	
-	private bool allowedToAttack = true;	// If explodetaur is allowed to attack.
-	public bool attacking;					// If explodetaur is currently swinging its arms to attack.
+	private bool isDead;					// If the explodetaur is dead.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 2f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 3f;	// The fastest the player can travel in the x axis.
 	public float health = 14f;				// The health points for this instance of the explodetaur prefab.
 	private Vector2 playerPos;				// The player's position.
-	public AudioClip swingClip;				// Clip for when explodetaur attacks.
 	public AudioClip deathClip;				// CLip for when explodetaur meets its end.
+	public Sprite deathSprite;				// Final image in the death animation. 
 
+	private Transform theTransform;			// Reference to the Transform.
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
@@ -20,32 +21,29 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
+		theTransform = transform;
 		anim = GetComponent<Animator>();
-		player = GameObject.FindWithTag("Player").transform;
+		GameObject gO = GameObject.FindWithTag("Player");
+		player = gO.transform;
 		rigid = GetComponent<Rigidbody2D>();
-		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		playerH = gO.GetComponent<PlayerHealth>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
-		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
+		if ((playerPos.x > theTransform.position.x && !isRight) || (playerPos.x < theTransform.position.x && isRight))
 			Flip();
-		if (allowedToAttack && !playerH.isDead && Functions.DeltaMax(playerPos.x, transform.position.x, 2.8f) && Functions.DeltaMax(playerPos.y, transform.position.y, 2f)) {
-			anim.SetTrigger("Attack");
-			attacking = true;
-			StartCoroutine(PlayerHurt());
-			StartCoroutine(WaitToAttack());
-			custom.PlayClipAt(swingClip, transform.position);
+		if (!isDead && !playerH.isDead && Functions.DeltaMax(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
+			isDead = true;
+			StartCoroutine(Death());		
 		}
-		else if (allowedToAttack && Functions.DeltaMin(playerPos.x, transform.position.x, 2.8f) && Functions.DeltaMax(playerPos.y, transform.position.y, 2f)) {
+		else if (!playerH.isDead && Functions.DeltaMin(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
 			anim.SetTrigger("Walk");
-			attacking = false;
 			Move();
 		}
 		else {
 			anim.SetTrigger("Idle");
-			attacking = false;
 		}		
 	}
 
@@ -57,7 +55,7 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	private void Move () {
 		float sign;
 		// If it is to the left or right of a hero
-		if (playerPos.x > transform.position.x)
+		if (playerPos.x > theTransform.position.x)
 			sign = 1f;
 		else
 			sign = -1f; 
@@ -70,37 +68,35 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 
 	private void Flip () {
 		isRight = !isRight;
-		Vector3 theScale = transform.localScale;
+		Vector3 theScale = theTransform.localScale;
 		theScale.x *= -1;
-		transform.localScale = theScale;
+		theTransform.localScale = theScale;
 	}
 
 	public void TakeDamage (float damage) {
 		health -= damage;
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
 		if (health <= 0f) {
-			anim.SetTrigger("Death");
-			custom.PlayClipAt(deathClip, transform.position);
-			rigid.Sleep();
-			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
-			GetComponent<PolygonCollider2D>().enabled = false;
-			enabled = false;
-		} else {
-			anim.SetTrigger("Hurt");
+			isDead = true;
+			StartCoroutine(Death());
 		}
+		else
+			anim.SetTrigger("Hurt");
 	}
 
-	// Wait to attack again.
-	private IEnumerator WaitToAttack () {
-        allowedToAttack = false;
-        yield return new WaitForSeconds(3f);
-        allowedToAttack = true;
-    }
-
-    // Allows you to dodge the attack
-    private IEnumerator PlayerHurt () {
-    	yield return new WaitForSeconds(0.32f);
-    	if (Functions.DeltaMax(playerPos.x, transform.position.x, 2.8f))
-    		playerH.TakeDamage(10f, true, isRight);
+    public IEnumerator Death () {
+    	// Do visual/audio death stuff then wait to explode and depower.
+    	custom.PlayClipAt(deathClip, theTransform.position);
+		anim.SetTrigger("Death");
+    	yield return new WaitForSeconds(0.35f);
+    	if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 3.05f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+    		playerH.TakeDamage(20f, true, isRight);
+    	// This should happen in the animation, but if the game lags...
+    	GetComponent<SpriteRenderer>().sprite = deathSprite;
+    	GetComponentInChildren<Light>().enabled = false;
+		Destroy(rigid);
+		GetComponent<PolygonCollider2D>().enabled = false;
+		GetComponent<Animator>().enabled = false;
+		enabled = false;
     }
 }

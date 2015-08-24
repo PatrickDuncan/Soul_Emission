@@ -10,12 +10,14 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
 	public bool allowedToDestroy;			// If the bullet can be destroyed when collided.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 0.35f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 0.6f;	// The fastest the player can travel in the x axis.
 	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when four eyes meets its end.
 	public AudioClip fallClip;				// CLip for when four eyes hits the ground.
+	public Sprite deathSprite;				// Final image in the death animation. 
 
+	private Transform theTransform;			// Reference to the Transform.
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
@@ -23,30 +25,32 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
+		theTransform = transform;
 		anim = GetComponent<Animator>();
-		player = GameObject.FindGameObjectWithTag("Player").transform;
+		GameObject gO = GameObject.FindWithTag("Player");
+		player = gO.transform;
 		rigid = GetComponent<Rigidbody2D>();
-		playerH = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		playerH = gO.GetComponent<PlayerHealth>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
-		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
+		if ((playerPos.x > theTransform.position.x && !isRight) || (playerPos.x < theTransform.position.x && isRight))
 			Flip();
-		if (allowedToMove && hasFallen && !playerH.isDead && Functions.DeltaMax(playerPos.y, transform.position.y, 5f)) {
+		if (allowedToMove && hasFallen && !playerH.isDead && Functions.DeltaMax(playerPos.y, theTransform.position.y, 5f)) {
 			anim.SetTrigger("Walk");
 			Move();
 		}
 		// The player has to be under it, but there must be a limit to the y because it has to drop when the player is on the same floor.
-		else if (!hasFallen && Functions.DeltaMax(playerPos.x, transform.position.x, 13f)) {
-			if (playerPos.y < transform.position.y && Functions.DeltaMax(playerPos.y, transform.position.y, 5f)) {
+		else if (!hasFallen && Functions.DeltaMax(playerPos.x, theTransform.position.x, 13f)) {
+			if (playerPos.y < theTransform.position.y && Functions.DeltaMax(playerPos.y, theTransform.position.y, 5f)) {
 				hasFallen = true;
 				rigid.gravityScale = 1.8f;
 				StartCoroutine(WaitForFall());
 			}
 		}
-		else if (!allowedToMove && !hasFallen && Functions.DeltaMin(playerPos.y, transform.position.y, 10f)) {
+		else if (!allowedToMove && !hasFallen && Functions.DeltaMin(playerPos.y, theTransform.position.y, 10f)) {
 			anim.SetTrigger("Idle");
 		}		
 	}
@@ -67,7 +71,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private void Move () {
 		float sign;
 		// If it is to the left or right of a hero
-		if (playerPos.x > transform.position.x)
+		if (playerPos.x > theTransform.position.x)
 			sign = 1f;
 		else
 			sign = -1f; 
@@ -80,28 +84,28 @@ public class FourEyes : MonoBehaviour, IEnemy {
 
 	private void Flip () {
 		isRight = !isRight;
-		Vector3 theScale = transform.localScale;
+		Vector3 theScale = theTransform.localScale;
 		theScale.x *= -1;
-		transform.localScale = theScale;
+		theTransform.localScale = theScale;
 	}
 
 	public void TakeDamage (float damage) {
 		health -= damage;
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
-		if (health <= 0f) {
-			anim.SetTrigger("Death");
-			try {
-				custom.PlayClipAt(deathClip, transform.position);
-			} catch (Exception e) {
-				print(e);
-			} 
-			rigid.Sleep();
-			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
-			GetComponent<PolygonCollider2D>().enabled = false;
-			enabled = false;
-		} else {
+		if (health <= 0f)
+			StartCoroutine(Death());		
+		else
 			anim.SetTrigger("Hurt");
-		}
+	}
+
+	public IEnumerator Death () {
+		custom.PlayClipAt(deathClip, theTransform.position);
+		anim.SetTrigger("Death");
+		yield return new WaitForSeconds(0.4f);
+		GetComponent<SpriteRenderer>().sprite = deathSprite;
+		GetComponent<PolygonCollider2D>().enabled = false;
+		GetComponent<Animator>().enabled = false;
+		enabled = false;
 	}
 
 	public void CanShoot () {
@@ -116,7 +120,8 @@ public class FourEyes : MonoBehaviour, IEnemy {
 
     private IEnumerator WaitForFall () {
     	yield return new WaitForSeconds(0.75f);
-		custom.PlayClipAt(fallClip, transform.position);
+		custom.PlayClipAt(fallClip, theTransform.position);
+		Destroy(rigid);
     	allowedToMove = true;
 		GetComponent<PolygonCollider2D>().enabled = true;
 		anim.SetTrigger("Drop");

@@ -10,9 +10,10 @@ public class PlayerHealth : MonoBehaviour {
 	[HideInInspector]
 	public bool isDead;						// If the player is dead.
 
+	private Transform theTransform;			// Reference to the Tranform;
 	private Animator ripAnim;				// Reference to Rip's Animator
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer.
-	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
+	public PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator on the player.
 	private Gun gun;						// Reference to the Gun class.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
@@ -22,13 +23,16 @@ public class PlayerHealth : MonoBehaviour {
 	public AudioClip deathClip;				// Clip for when the player dies.
 
 	private void Awake () {
-		ripAnim = GameObject.Find("Rip").GetComponent<Animator>();
-		ripSprite = GameObject.Find("Rip").GetComponent<SpriteRenderer>();
+		theTransform = transform;
+		GameObject gO  = GameObject.FindWithTag("Rip"); 
+		ripAnim = gO.GetComponent<Animator>();
+		ripSprite = gO.GetComponent<SpriteRenderer>();
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
-		gun = GameObject.Find("Gun").GetComponent<Gun>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
-		reset = GameObject.Find("Scripts").GetComponent<Reset>();
+		gun = GetComponentInChildren<Gun>();
+		gO = GameObject.FindWithTag("Scripts");
+		custom = gO.GetComponent<CustomPlayClipAtPoint>();
+		reset = gO.GetComponent<Reset>();
 		currentH = HEALTH;
 	}	
 
@@ -42,15 +46,17 @@ public class PlayerHealth : MonoBehaviour {
 			Die();
 		else if (!playerCtrl.isGhost && !isDead) {
 			currentH -= damage;
+			playerCtrl.maxSpeed = Mathf.Pow(damage, 2)/50;
 			if (push && right)
-				GetComponent<Rigidbody2D>().AddForce(new Vector2(10f, 0), ForceMode2D.Impulse);
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(damage*5, 0), ForceMode2D.Impulse);
 			else if (push && !right)
-				GetComponent<Rigidbody2D>().AddForce(new Vector2(-10f, 0), ForceMode2D.Impulse);
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(-damage*5, 0), ForceMode2D.Impulse);
+			StartCoroutine(Push());
 			if (currentH <= 0f) {
 				Die();
 			} else {
-				custom.PlayClipAt(injuryClip, transform.position); 	// Only one sound when you die
-				reset.helmetLight.intensity -= damage/40;
+				custom.PlayClipAt(injuryClip, theTransform.position); 	// Only one sound when you die
+				reset.helmetLight.intensity -= damage/20;
 			}
 		}
 	}
@@ -63,7 +69,7 @@ public class PlayerHealth : MonoBehaviour {
 			anim.SetTrigger("DeathRight");
 		else
 			anim.SetTrigger("DeathLeft");
-		custom.PlayClipAt(deathClip, transform.position);
+		custom.PlayClipAt(deathClip, theTransform.position);
 		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 		reset.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
 		gun.allowedToShoot = false;
@@ -71,6 +77,11 @@ public class PlayerHealth : MonoBehaviour {
 		ripSprite.enabled = true;
 		ripAnim.enabled = true;
 		StartCoroutine(Revive());
+	}
+
+	private IEnumerator Push () {
+		yield return new WaitForSeconds(0.15f);
+		playerCtrl.maxSpeed = 1.5f;
 	}
 
 	private IEnumerator Revive () {

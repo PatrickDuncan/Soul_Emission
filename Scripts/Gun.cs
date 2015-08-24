@@ -9,6 +9,7 @@ public class Gun : MonoBehaviour {
 	private Vector3 position;				// For setting the position relative to the player.
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	
+	private Transform theTransform;			// Reference to the Transform.
 	public AudioClip shootClip;				// Clip for when the player shoots.
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator component.
@@ -16,10 +17,11 @@ public class Gun : MonoBehaviour {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
+		theTransform = transform;
 		anim = transform.root.gameObject.GetComponent<Animator>();
 		player = GameObject.FindWithTag("Player").transform;
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void FixedUpdate () {
@@ -31,7 +33,7 @@ public class Gun : MonoBehaviour {
 				anim.SetTrigger("RightShoot");
 			else
 				anim.SetTrigger("LeftShoot");
-			custom.PlayClipAt(shootClip, transform.position);
+			custom.PlayClipAt(shootClip, theTransform.position);
 			// Derive the bullet's position from the player's position.
 			if (playerCtrl.isRight) {
 				position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);

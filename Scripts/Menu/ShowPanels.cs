@@ -48,12 +48,13 @@ public class ShowPanels : MonoBehaviour {
 		panel.SetActive(false);
 		if (fromPause && panel != pausePanel)
 			Show(pausePanel);
-		else if (panel != PC1 && panel != PC2 && panel != Mobile1 && panel != Mobile2)
-			Tint.SetActive(false);
+		else if (panel != PC1 && panel != PC2 && panel != Mobile1 && panel != Mobile2) {
+			if (!fromPause)
+				Tint.SetActive(false);
+		}
 	}
 
 	public void Switch (GameObject panel) {
-		
 		if (panel == PC1) 
 			PC2.SetActive(true);
 		else if (panel == PC2) 
@@ -62,7 +63,6 @@ public class ShowPanels : MonoBehaviour {
 			Mobile2.SetActive(true);
 		else if (panel == Mobile2) 
 			Mobile1.SetActive(true);
-
 		panel.SetActive(false);
 	}
 

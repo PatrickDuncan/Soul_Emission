@@ -8,29 +8,32 @@ public class PlayerControl : MonoBehaviour {
 	public bool allowedToGhost = true;		// For determining if the player is using ghost powers.
 	public bool isBeam = false;				// If the player is using the beam.
 	public bool isNormal = true;			// If the player's layer mask is not Ghost;
+	public bool allowedToBeam = true;		// If the player can use the beam.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
+	public float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
+	private GameObject[] enemies;			// List of all the enemy tagged game objects.
 
+	private Transform theTransform;			// Reference to the Transform.
 	private Animator anim;					// Reference to the Animator component				
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component
 	private Lift lift;						// Reference to the Lift script.
 	private Reset reset;					// Reference to the Reset script.
 
-
 	private void Awake () {
+		theTransform = transform;
 		anim = GetComponent<Animator>();
-		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		lift = GameObject.FindWithTag("Beam").GetComponent<Lift>();
+		playerH = GetComponent<PlayerHealth>();
 		rigid = GetComponent<Rigidbody2D>();
-		reset = GameObject.Find("Scripts").GetComponent<Reset>();
+		reset = GameObject.FindWithTag("Scripts").GetComponent<Reset>();
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		if (!isRight)
 			reset.ResetHelmet();
 	}
 
 	private void Update () {
-	    if (Input.GetButtonDown("Ghost") && allowedToGhost && lift.allowedToBeam) {
+	    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
 			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
 	    	if (Functions.GetPath(anim) != 485325471 && Functions.GetPath(anim) != -1268868314) { 
 	    		if (rigid.gravityScale == 1.8f) {
@@ -60,17 +63,23 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	private void OnLevelWasLoaded (int level) {
+		// Resets the enemies array on level load.
+		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+	}
+
 	private bool EnemiesFarAway () {
 		// Loops through all enemies to make sure that they're not colliding (by comparing the x values).
-		foreach (GameObject enemy in GameObject.FindGameObjectsWithTag("Enemy")) {
-			Vector3 enemyPos = enemy.transform.position;
+		Vector3 enemyPos;
+		foreach (GameObject enemy in enemies) {
+			enemyPos = enemy.transform.position;
 			if (!isRight && enemy.name.Equals("Pointy Legs")) {
 				// Return false if any one enemy is too close.
-				if (Functions.DeltaMax(enemyPos.x, transform.position.x, 2.2f) && Functions.DeltaMax(enemyPos.y, transform.position.y, 2f))
+				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 2.2f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 2f))
 					return false;
 			} 
 			else {
-				if (Functions.DeltaMax(enemyPos.x, transform.position.x, 3.6f) && Functions.DeltaMax(enemyPos.y, transform.position.y, 2f))
+				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 3.6f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 2f))
 					return false;
 			}
 		}
@@ -109,10 +118,11 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Door") && GameObject.FindWithTag(col.gameObject.tag).GetComponent<Light>().enabled) {
+		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponent<Light>().enabled) {
 			// If right door move to next scene, if left move to previous
 			int level = Application.loadedLevel;
-			Application.LoadLevel(level + 1);
+			//***Load Level***//
+			Application.LoadLevel(level + 1); 
 		}
 	}
 

@@ -3,20 +3,23 @@
 public class Bullet : MonoBehaviour {
 
 	private void Start () {
-		Destroy(gameObject, 0.9f);		// Automatically destroy the bullet in 1 second.
+		Destroy(gameObject, 0.7f);		// Automatically destroy the bullet in 1 second.
 	}
 	
 	private void OnTriggerEnter2D (Collider2D col) {
-		string tag = col.gameObject.name;
-		if (tag.Equals("Background") || tag.Contains("Access") || tag.Contains("Door") || tag.Contains("floor"))
+		string name = col.gameObject.name;
+		GameObject gO = col.gameObject;
+		if (name.Equals("Background") || name.Contains("Access") || name.Contains("Door") || name.Contains("floor"))
 			Destroy(gameObject);
-		else if (tag.Contains("Pointy Legs") && !GameObject.Find(tag).GetComponent<PolygonCollider2D>().isTrigger) {
-			GameObject.Find(tag).GetComponent<PointyLegs>().TakeDamage(7f);
-			Destroy(gameObject);
-		}
-		else if (tag.Contains("Four Eyes") && !GameObject.Find(tag).GetComponent<PolygonCollider2D>().isTrigger && GameObject.Find(tag).GetComponent<FourEyes>().allowedToDestroy) {
-			GameObject.Find(tag).GetComponent<FourEyes>().TakeDamage(7f);
-			Destroy(gameObject);
+		else if (!gO.GetComponent<PolygonCollider2D>().isTrigger) {
+			if (col.gameObject.tag.Equals("Enemy"))
+				Destroy(gameObject);		
+			if (name.Contains("Pointy Legs"))
+				gO.GetComponent<PointyLegs>().TakeDamage(7f);
+			else if (name.Contains("Four Eyes") && gO.GetComponent<FourEyes>().allowedToDestroy)
+				gO.GetComponent<FourEyes>().TakeDamage(7f);
+			else if (name.Contains("Explodetaur"))
+				gO.GetComponent<Explodetaur>().TakeDamage(7f);
 		}
 	}
 }

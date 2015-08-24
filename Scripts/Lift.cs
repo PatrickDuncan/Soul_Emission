@@ -3,8 +3,7 @@ using System.Collections;
 
 public class Lift : MonoBehaviour {		
 
-	public bool allowedToBeam = true;		// If the player can use the beam.
-
+	private Transform theTransform;			// Reference to the Transform.
 	private Rigidbody2D rigid;				// Reference to the player's rigid body.
 	private PolygonCollider2D poly;			// Reference to the player's polygon collider.
 	private Transform player;				// Reference to the player's transform.
@@ -16,14 +15,16 @@ public class Lift : MonoBehaviour {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
-		rigid = GameObject.FindWithTag("Player").GetComponent<Rigidbody2D>();
-		poly = GameObject.FindWithTag("Player").GetComponent<PolygonCollider2D>();
-		playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerControl>();
-		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		gun = GameObject.Find("Gun").GetComponent<Gun>();
-		player = GameObject.FindWithTag("Player").transform;
+		theTransform = transform;
+		GameObject gO  = GameObject.FindWithTag("Player");
+		rigid = gO.GetComponent<Rigidbody2D>();
+		poly = gO.GetComponent<PolygonCollider2D>();
+		playerCtrl = gO.GetComponent<PlayerControl>();
+		playerH = gO.GetComponent<PlayerHealth>();
+		gun = gO.GetComponentInChildren<Gun>();
+		player = gO.transform;
 		anim = GetComponent<Animator>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	public void OnMouseDown () {
@@ -35,10 +36,10 @@ public class Lift : MonoBehaviour {
 	}
 
 	private void Beam () {
-		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && allowedToBeam && !playerCtrl.isGhost && !playerH.isDead) {
-			allowedToBeam = false;
+		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && playerCtrl.allowedToBeam && !playerCtrl.isGhost && !playerH.isDead) {
+			playerCtrl.allowedToBeam = false;
 			playerCtrl.isBeam = true;
-			if (transform.position.y < player.position.y) {
+			if (theTransform.position.y < player.position.y) {
 				anim.SetTrigger("BeamDown");
 				rigid.gravityScale = 0.1f;
 			}
@@ -50,12 +51,12 @@ public class Lift : MonoBehaviour {
 			gun.allowedToShoot = false;
 			rigid.velocity = new Vector2(0, 0);	
 			StartCoroutine(WaitForBeam());
-			custom.PlayClipAt(liftClip, transform.position);
+			custom.PlayClipAt(liftClip, theTransform.position);
 		}
 	}
 
 	private void OnTriggerExit2D (Collider2D col) {
-		if (!allowedToBeam) {
+		if (!playerCtrl.allowedToBeam) {
 			rigid.gravityScale = 1.8f;
 			poly.isTrigger = false;
 			gun.allowedToShoot = true;
@@ -66,6 +67,6 @@ public class Lift : MonoBehaviour {
 	
 	private IEnumerator WaitForBeam () {
 		yield return new WaitForSeconds(4.5f);
-		allowedToBeam = true;
+		playerCtrl.allowedToBeam = true;
 	}	
 }

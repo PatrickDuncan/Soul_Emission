@@ -11,8 +11,6 @@ public class Positions : MonoBehaviour {
 	public Vector3[] pointy;		// The positions for this level for the pointy legs.
 	public Vector3[] fourEyes;		// The positions for this level for the four eyes.
 	public bool isRight;			// Whether the player is facing right.
-	public int pointyStart;			// The value to start cycling through the four eyes tags.
-	public int fourEyesStart;		// The value to start cycling through the four eyes tags.
 
 	private void Awake () {
 		TextAsset asset = Resources.Load("playerPos") as TextAsset;
@@ -21,7 +19,6 @@ public class Positions : MonoBehaviour {
 		pointyPos = asset.text;
 		asset = Resources.Load("fourEyesPos") as TextAsset;
 		fourEyesPos = asset.text;
-
 		GetPositions();
 	}
 
@@ -30,15 +27,14 @@ public class Positions : MonoBehaviour {
 	}
 
 	private void GetPositions () {
-		pointyStart = fourEyesStart = 1;
-		player = computePlayer();
+		player = ComputePlayer();
 		pointy = new Vector3[0];
 		fourEyes = new Vector3[0];
-		pointy = compute(pointy, pointyPos, "pointy");
-		fourEyes = compute(fourEyes, fourEyesPos, "fourEyes");
+		pointy = Compute(pointy, pointyPos, "pointy");
+		fourEyes = Compute(fourEyes, fourEyesPos, "fourEyes");
 	}
 
-	private Vector3 computePlayer () {
+	private Vector3 ComputePlayer () {
 		try {
 			string[] split = playerPos.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 			int i=0;
@@ -59,7 +55,7 @@ public class Positions : MonoBehaviour {
 		return new Vector3 (0f, 0f, 0f);
 	}
 
-	private Vector3[] compute (Vector3[] vector, string file, string enemy) {
+	private Vector3[] Compute (Vector3[] vector, string file, string enemy) {
 		try {
 			string[] split = file.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 			int i=0;
@@ -79,11 +75,6 @@ public class Positions : MonoBehaviour {
 					}
 					break;				
 				}
-				else if (s.Length != 1)
-					if (enemy.Equals("pointy"))
-						pointyStart++;
-					else if (enemy.Equals("fourEyes"))
-						fourEyesStart++;
 				i++;
 			}
 		}

@@ -11,8 +11,8 @@ public class Pause : MonoBehaviour {
 	public GameObject pausePanel;				// Store a reference to the Game Object PausePanel.
 	
 	private void Awake () {
-		showPanels = GetComponent<ShowPanels> ();
-		startScript = GetComponent<StartOptions> ();
+		showPanels = GetComponent<ShowPanels>();
+		startScript = GetComponent<StartOptions>();
 	}
 
 	private void Update () {
@@ -20,7 +20,7 @@ public class Pause : MonoBehaviour {
 			DoPause();
 		} 
 		else if (Input.GetButtonDown("Cancel") && isPaused && !startScript.inMainMenu && !showPanels.fromPause) {
-			UnPause ();
+			UnPause();
 		}
 	}
 

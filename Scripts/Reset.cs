@@ -10,16 +10,18 @@ public class Reset : MonoBehaviour {
 	private Animator anim;					// Reference to the Animator component. Initialized in Unity.				
 	private Positions positions;			// Reference to the Positions class.
 
+	private GameObject player;				// Reference to the player's game object.
 	public AudioClip kissClip;				// Normal background song.
 	public AudioClip expanseClip;			// Secondary background song.
 	public Quaternion defaultLight;			// Default position of the helmet light
 
 
 	private void Awake () {
-		playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerControl>();
-		playerTran = GameObject.FindWithTag("Player").transform;
-		anim = GameObject.FindWithTag("Player").GetComponent<Animator>();
-		positions = GameObject.Find("Scripts").GetComponent<Positions>();
+		player = GameObject.FindWithTag("Player");
+		playerCtrl = player.GetComponent<PlayerControl>();
+		playerTran = player.transform;
+		anim = player.GetComponent<Animator>();
+		positions = GameObject.FindWithTag("Scripts").GetComponent<Positions>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
 	}
 
@@ -29,7 +31,7 @@ public class Reset : MonoBehaviour {
 	
 	private void OnLevelWasLoaded (int level) {
         ResetPosition();
-        AudioSource audio = GameObject.Find("Player").GetComponent<AudioSource>();
+        AudioSource audio = player.GetComponent<AudioSource>();
         if (level == 4)
         	audio.clip = expanseClip;
         else
@@ -45,19 +47,29 @@ public class Reset : MonoBehaviour {
 	    	ResetPosition();
 	    	ResetHelmet();
 	    	// Loop through all the pointy legs in the scene and reset their positions.
-	    	int	j = positions.pointyStart; 
-	    	for (int i=0; i<positions.pointy.Length; i++) {
-		    	GameObject.Find("Pointy Legs " + j).transform.position = positions.pointy[i];
-		    	if (GameObject.Find("Pointy Legs " + j).GetComponent<PointyLegs>().health > 0f)
-		    		GameObject.Find("Pointy Legs " + j).GetComponent<PointyLegs>().health = 45f;
-		    	j++;
+	    	int j = 0;
+	    	GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+	    	for (int i=0; i<enemies.Length; i++) {
+		    	if (enemies[i].name.Contains("Pointy Legs")) {
+			    	enemies[i].transform.position = positions.pointy[i];
+			    	if (enemies[i].GetComponent<PointyLegs>().health > 0f)
+			    		enemies[i].GetComponent<PointyLegs>().health = 45f;
+			    	j++;
+			    	if (j == positions.pointy.Length)
+			    		break;
+			    }
 		    }
-		    j = positions.fourEyesStart;
+		  //  j = positions.fourEyesStart;
+		    j = 0;
 		    for (int i=0; i<positions.fourEyes.Length; i++) {
-		    	GameObject.Find("Four Eyes " + j).transform.position = positions.fourEyes[i];
-		    	if (GameObject.Find("Four Eyes " + j).GetComponent<FourEyes>().health > 0f)
-		    		GameObject.Find("Four Eyes " + j).GetComponent<FourEyes>().health = 100f;
-		    	j++;
+		    	if (enemies[i].name.Contains("Four Eyes")) {
+			    	enemies[i].transform.position = positions.fourEyes[i];
+			    	if (enemies[i].GetComponent<FourEyes>().health > 0f)
+			    		enemies[i].GetComponent<FourEyes>().health = 45f;
+			    	j++;
+			    	if (j == positions.fourEyes.Length)
+			    		break;
+			    }
 		    }
 		} catch (Exception e) {
 			print(e);

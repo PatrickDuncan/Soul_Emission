@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class PointyLegs : MonoBehaviour {
 
@@ -7,12 +8,15 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
 	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 1.3f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
+	private float maxVal;					// Maximum value used in the DeltaMax function.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip swingClip;				// Clip for when pointy legs attacks.
 	public AudioClip deathClip;				// CLip for when pointy legs meets its end.
+	public Sprite deathSprite;				// Final image in the death animation. 
 
+	private Transform theTransform;			// Reference to the transform.
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Player's transform.
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component.
@@ -20,25 +24,32 @@ public class PointyLegs : MonoBehaviour {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Awake () {
+		theTransform = transform;
 		anim = GetComponent<Animator>();
-		player = GameObject.FindWithTag("Player").transform;
+		GameObject gO  = GameObject.FindWithTag("Player");
+		player = gO.transform;
 		rigid = GetComponent<Rigidbody2D>();
-		playerH = GameObject.FindWithTag("Player").GetComponent<PlayerHealth>();
-		custom = GameObject.Find("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		playerH = gO.GetComponent<PlayerHealth>();
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
-		if ((playerPos.x > transform.position.x && !isRight) || (playerPos.x < transform.position.x && isRight))
+		if ((playerPos.x > theTransform.position.x && !isRight) || (playerPos.x < theTransform.position.x && isRight))
 			Flip();
-		if (allowedToAttack && !playerH.isDead && Functions.DeltaMax(playerPos.x, transform.position.x, 2.8f) && Functions.DeltaMax(playerPos.y, transform.position.y, 2f)) {
+		if (playerH.playerCtrl.isRight) 
+			maxVal = 2.8f;
+		else
+			maxVal = 3.2f;
+		if (allowedToAttack && !playerH.isDead && Functions.DeltaMax(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
+			allowedToAttack = false;
 			anim.SetTrigger("Attack");
 			attacking = true;
 			StartCoroutine(PlayerHurt());
 			StartCoroutine(WaitToAttack());
-			custom.PlayClipAt(swingClip, transform.position);
+			custom.PlayClipAt(swingClip, theTransform.position);
 		}
-		else if (allowedToAttack && Functions.DeltaMin(playerPos.x, transform.position.x, 2.8f) && Functions.DeltaMax(playerPos.y, transform.position.y, 2f)) {
+		else if (allowedToAttack && Functions.DeltaMin(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
 			anim.SetTrigger("Walk");
 			attacking = false;
 			Move();
@@ -57,7 +68,7 @@ public class PointyLegs : MonoBehaviour {
 	private void Move () {
 		float sign;
 		// If it is to the left or right of a hero
-		if (playerPos.x > transform.position.x)
+		if (playerPos.x > theTransform.position.x)
 			sign = 1f;
 		else
 			sign = -1f; 
@@ -70,37 +81,41 @@ public class PointyLegs : MonoBehaviour {
 
 	private void Flip () {
 		isRight = !isRight;
-		Vector3 theScale = transform.localScale;
+		Vector3 theScale = theTransform.localScale;
 		theScale.x *= -1;
-		transform.localScale = theScale;
+		theTransform.localScale = theScale;
 	}
 
 	public void TakeDamage (float damageAmount) {
 		health -= damageAmount;
 		// When it dies disable all unneeded game objects and switch to death animation/sprite
-		if (health <= 0f) {
-			anim.SetTrigger("Death");
-			custom.PlayClipAt(deathClip, transform.position);
-			rigid.Sleep();
-			rigid.constraints = RigidbodyConstraints2D.FreezeAll;
-			GetComponent<PolygonCollider2D>().enabled = false;
-			enabled = false;
-		} else {
+		if (health <= 0f)
+			StartCoroutine(Death());
+		else
 			anim.SetTrigger("Hurt");
-		}
+	}
+
+	public IEnumerator Death () {
+		custom.PlayClipAt(deathClip, theTransform.position);
+		anim.SetTrigger("Death");
+		yield return new WaitForSeconds(0.40f);    	
+		Destroy(rigid);
+		GetComponent<SpriteRenderer>().sprite = deathSprite;
+		GetComponent<PolygonCollider2D>().enabled = false;
+		GetComponent<Animator>().enabled = false;
+		enabled = false;
 	}
 
 	// Wait to attack again.
 	private IEnumerator WaitToAttack () {
-        allowedToAttack = false;
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(2.9f);
         allowedToAttack = true;
     }
 
     // Allows you to dodge the attack
     private IEnumerator PlayerHurt () {
     	yield return new WaitForSeconds(0.32f);
-    	if (Functions.DeltaMax(playerPos.x, transform.position.x, 2.8f))
+    	if (Functions.DeltaMax(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
     		playerH.TakeDamage(10f, true, isRight);
     }
 }

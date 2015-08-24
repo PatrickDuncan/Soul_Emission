@@ -2,9 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 public class ToCamera : MonoBehaviour {
-	private new Transform camera;			//Reference the Main Camera's transform
+	private Transform theTransform; 		// Reference to the Transform.
+	private new Transform camera;			// Reference the Main Camera's transform
 
 	private void Awake () {
+		theTransform = transform;
 		camera = GameObject.FindWithTag("MainCamera").transform;
 	}
 
@@ -13,6 +15,6 @@ public class ToCamera : MonoBehaviour {
     }
 
 	private void Update () {
-		transform.position = new Vector3(camera.position.x, camera.position.y, 0f);
+		theTransform.position = new Vector3(camera.position.x, camera.position.y, 0f);
 	}
 }
