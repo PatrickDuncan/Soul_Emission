@@ -43,7 +43,7 @@ public class Reset : MonoBehaviour {
 	public void ResetScene () {
 		try {
 	    	playerTran.rotation = Quaternion.Euler(0f, 0f, 0f);
-	    	helmetLight.intensity = 1.575f;
+	    	helmetLight.intensity = 3f;
 	    	ResetPosition();
 	    	ResetHelmet();
 	    	// Loop through all the pointy legs in the scene and reset their positions.
@@ -51,7 +51,7 @@ public class Reset : MonoBehaviour {
 	    	GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
 	    	for (int i=0; i<enemies.Length; i++) {
 		    	if (enemies[i].name.Contains("Pointy Legs")) {
-			    	enemies[i].transform.position = positions.pointy[i];
+			    	enemies[i].transform.position = positions.pointy[j];
 			    	if (enemies[i].GetComponent<PointyLegs>().health > 0f)
 			    		enemies[i].GetComponent<PointyLegs>().health = 45f;
 			    	j++;
@@ -63,7 +63,7 @@ public class Reset : MonoBehaviour {
 		    j = 0;
 		    for (int i=0; i<positions.fourEyes.Length; i++) {
 		    	if (enemies[i].name.Contains("Four Eyes")) {
-			    	enemies[i].transform.position = positions.fourEyes[i];
+			    	enemies[i].transform.position = positions.fourEyes[j];
 			    	if (enemies[i].GetComponent<FourEyes>().health > 0f)
 			    		enemies[i].GetComponent<FourEyes>().health = 45f;
 			    	j++;

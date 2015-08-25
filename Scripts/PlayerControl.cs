@@ -36,7 +36,7 @@ public class PlayerControl : MonoBehaviour {
 	    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
 			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
 	    	if (Functions.GetPath(anim) != 485325471 && Functions.GetPath(anim) != -1268868314) { 
-	    		if (rigid.gravityScale == 1.8f) {
+	    		if (rigid.gravityScale > 0f) {
 		    		allowedToGhost = false;
 		    		Ghost(); 
 		    	}
@@ -66,6 +66,24 @@ public class PlayerControl : MonoBehaviour {
 	private void OnLevelWasLoaded (int level) {
 		// Resets the enemies array on level load.
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+	}
+
+	private void OnCollisionEnter2D (Collision2D col) {
+		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponent<Light>().enabled) {
+			// If right door move to next scene, if left move to previous
+			int level = Application.loadedLevel;
+			//***Load Level***//
+			Application.LoadLevel(level + 1); 
+		}
+	}
+	
+	private void OnCollisionStay2D (Collision2D col) {
+		// Stuck on head fix.
+		if (col.gameObject.tag.Equals("Enemy")) {
+			//Layer 0 is "Default"
+		    if (gameObject.layer == 0 && theTransform.position.y > col.gameObject.transform.position.y)
+		    	StartCoroutine(StuckOnHead());
+		}
 	}
 
 	private bool EnemiesFarAway () {
@@ -110,20 +128,11 @@ public class PlayerControl : MonoBehaviour {
 		gameObject.layer = LayerMask.NameToLayer("Ghost");
 		isNormal = false;
 		previousIntensity = reset.helmetLight.intensity;
-		reset.helmetLight.intensity = 4;
+		reset.helmetLight.intensity = 6f;
 		GetComponent<AudioSource>().pitch = 3f;
 		maxSpeed = 3f;
 		rigid.velocity = new Vector2(rigid.velocity.x, 0);		// Alllows you to stop in the mid air.
 		StartCoroutine(GhostTime());
-	}
-
-	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponent<Light>().enabled) {
-			// If right door move to next scene, if left move to previous
-			int level = Application.loadedLevel;
-			//***Load Level***//
-			Application.LoadLevel(level + 1); 
-		}
 	}
 
 	private void Flip () {
@@ -154,5 +163,11 @@ public class PlayerControl : MonoBehaviour {
 	private IEnumerator WaitForGhost () {
     	yield return new WaitForSeconds(10f);
     	allowedToGhost = true;
+	}
+
+	private IEnumerator StuckOnHead () {
+    	gameObject.layer = LayerMask.NameToLayer("Ghost");
+    	yield return new WaitForSeconds(2f);
+    	gameObject.layer = LayerMask.NameToLayer("Default");
 	}
 }

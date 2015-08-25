@@ -37,12 +37,12 @@ public class Gun : MonoBehaviour {
 			// Derive the bullet's position from the player's position.
 			if (playerCtrl.isRight) {
 				position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);
-				Rigidbody2D bulletInstance = Instantiate(bullet, position, Quaternion.Euler(new Vector3(0,0,0))) as Rigidbody2D;
+				Rigidbody2D bulletInstance = Instantiate(bullet, position, Quaternion.Euler(new Vector3(0, 0, 0))) as Rigidbody2D;
 				bulletInstance.velocity = new Vector2(SPEED, 0);
 			}
 			else {
 				position = new Vector3(player.position.x - SHIFTX, player.position.y + SHIFTY, 0);
-				Rigidbody2D bulletInstance = Instantiate(bullet, position, Quaternion.Euler(new Vector3(0,0,180f))) as Rigidbody2D;
+				Rigidbody2D bulletInstance = Instantiate(bullet, position, Quaternion.Euler(new Vector3(0, 0, 180f))) as Rigidbody2D;
 				bulletInstance.velocity = new Vector2(-SPEED, 0);
 			}
 			StartCoroutine(Wait());

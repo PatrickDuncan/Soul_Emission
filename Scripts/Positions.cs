@@ -7,9 +7,11 @@ public class Positions : MonoBehaviour {
 	private string playerPos;		// All the positions for the player.
 	private string pointyPos;		// All the positions for the pointy legs.
 	private string fourEyesPos;		// All the positions for the four eyes.
+	private string explodePos;		// ALl the positions for the explodetaur.
 	public Vector3 player;			// The position for this level.
 	public Vector3[] pointy;		// The positions for this level for the pointy legs.
 	public Vector3[] fourEyes;		// The positions for this level for the four eyes.
+	public Vector3[] explodetaur;	// The positions for this level for the explodetaur.
 	public bool isRight;			// Whether the player is facing right.
 
 	private void Awake () {
@@ -30,8 +32,10 @@ public class Positions : MonoBehaviour {
 		player = ComputePlayer();
 		pointy = new Vector3[0];
 		fourEyes = new Vector3[0];
-		pointy = Compute(pointy, pointyPos, "pointy");
-		fourEyes = Compute(fourEyes, fourEyesPos, "fourEyes");
+		explodetaur = new Vector3[0];
+		pointy = Compute(pointy, pointyPos);
+		fourEyes = Compute(fourEyes, fourEyesPos);
+		explodetaur = Compute(fourEyes, fourEyesPos);
 	}
 
 	private Vector3 ComputePlayer () {
@@ -55,7 +59,7 @@ public class Positions : MonoBehaviour {
 		return new Vector3 (0f, 0f, 0f);
 	}
 
-	private Vector3[] Compute (Vector3[] vector, string file, string enemy) {
+	private Vector3[] Compute (Vector3[] vector, string file) {
 		try {
 			string[] split = file.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 			int i=0;

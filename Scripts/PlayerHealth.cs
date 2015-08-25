@@ -56,7 +56,7 @@ public class PlayerHealth : MonoBehaviour {
 				Die();
 			} else {
 				custom.PlayClipAt(injuryClip, theTransform.position); 	// Only one sound when you die
-				reset.helmetLight.intensity -= damage/20;
+				reset.helmetLight.intensity -= damage/25;
 			}
 		}
 	}

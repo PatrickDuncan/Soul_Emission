@@ -8,8 +8,8 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
 	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1.3f;	// The fastest the player can travel in the x axis.
-	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
+	private readonly float MAXSPEED = 1.4f;	// The fastest the player can travel in the x axis.
+	public float health = 40f;				// The health points for this instance of the pointy legs prefab.
 	private float maxVal;					// Maximum value used in the DeltaMax function.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip swingClip;				// Clip for when pointy legs attacks.

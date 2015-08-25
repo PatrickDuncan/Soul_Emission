@@ -10,7 +10,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
 	public bool allowedToDestroy;			// If the bullet can be destroyed when collided.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 0.6f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 0.9f;	// The fastest the player can travel in the x axis.
 	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when four eyes meets its end.
@@ -58,7 +58,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private void OnCollisionStay2D (Collision2D col) {
 		if (allowedToAttack && col.gameObject.tag.Equals("Player")) {
 			allowedToAttack = false;
-			playerH.TakeDamage(1f, false, false);
+			playerH.TakeDamage(1.8f, false, false);
 			StartCoroutine(WaitToAttack());
 		}
 	}
@@ -102,6 +102,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 		custom.PlayClipAt(deathClip, theTransform.position);
 		anim.SetTrigger("Death");
 		yield return new WaitForSeconds(0.4f);
+		Destroy(rigid);
 		GetComponent<SpriteRenderer>().sprite = deathSprite;
 		GetComponent<PolygonCollider2D>().enabled = false;
 		GetComponent<Animator>().enabled = false;
@@ -121,7 +122,6 @@ public class FourEyes : MonoBehaviour, IEnemy {
     private IEnumerator WaitForFall () {
     	yield return new WaitForSeconds(0.75f);
 		custom.PlayClipAt(fallClip, theTransform.position);
-		Destroy(rigid);
     	allowedToMove = true;
 		GetComponent<PolygonCollider2D>().enabled = true;
 		anim.SetTrigger("Drop");
