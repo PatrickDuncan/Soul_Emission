@@ -15,7 +15,6 @@ public class PlayerHealth : MonoBehaviour {
 	private SpriteRenderer ripSprite;		// Reference to Rip's Sprite Renderer.
 	public PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private Animator anim;					// Reference to the Animator on the player.
-	private Gun gun;						// Reference to the Gun class.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 	private Reset reset;					// Reference to the Reset script.
 
@@ -29,7 +28,6 @@ public class PlayerHealth : MonoBehaviour {
 		ripSprite = gO.GetComponent<SpriteRenderer>();
 		playerCtrl = GetComponent<PlayerControl>();
 		anim = GetComponent<Animator>();
-		gun = GetComponentInChildren<Gun>();
 		gO = GameObject.FindWithTag("Scripts");
 		custom = gO.GetComponent<CustomPlayClipAtPoint>();
 		reset = gO.GetComponent<Reset>();
@@ -72,11 +70,18 @@ public class PlayerHealth : MonoBehaviour {
 		custom.PlayClipAt(deathClip, theTransform.position);
 		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 		reset.helmet.rotation = Quaternion.Euler(20f, 0f, 0f);
-		gun.allowedToShoot = false;
+		playerCtrl.allowedToShoot = false;
 		playerCtrl.allowedToGhost = false;
 		ripSprite.enabled = true;
 		ripAnim.enabled = true;
 		StartCoroutine(Revive());
+	}
+
+	public void AddHealth () {
+		if (currentH < HEALTH) {	// Can't overheal
+			reset.helmetLight.intensity += 0.4f;
+			currentH += 10f;
+		}
 	}
 
 	private IEnumerator Push () {
@@ -89,7 +94,7 @@ public class PlayerHealth : MonoBehaviour {
     	GetComponent<PolygonCollider2D>().enabled = true;
     	currentH = HEALTH/2;
     	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeRotation;
-    	gun.allowedToShoot = true;
+    	playerCtrl.allowedToShoot = true;
     	playerCtrl.allowedToGhost = true;
     	ripSprite.enabled = false;
     	reset.ResetScene();

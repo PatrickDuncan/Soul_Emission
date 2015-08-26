@@ -10,7 +10,6 @@ public class Lift : MonoBehaviour {
 	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
 	private Animator anim;					// Reference to the Animator component.
-	private Gun gun;						// Reference to the Gun class.
 	public AudioClip liftClip;				// Clip for when the lift is activated.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
@@ -21,7 +20,6 @@ public class Lift : MonoBehaviour {
 		poly = gO.GetComponent<PolygonCollider2D>();
 		playerCtrl = gO.GetComponent<PlayerControl>();
 		playerH = gO.GetComponent<PlayerHealth>();
-		gun = gO.GetComponentInChildren<Gun>();
 		player = gO.transform;
 		anim = GetComponent<Animator>();
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
@@ -48,7 +46,7 @@ public class Lift : MonoBehaviour {
 				rigid.gravityScale = -0.1f;
 			}
 			poly.isTrigger = true;
-			gun.allowedToShoot = false;
+			playerCtrl.allowedToShoot = false;
 			rigid.velocity = new Vector2(0, 0);	
 			StartCoroutine(WaitForBeam());
 			custom.PlayClipAt(liftClip, theTransform.position);
@@ -59,7 +57,7 @@ public class Lift : MonoBehaviour {
 		if (!playerCtrl.allowedToBeam) {
 			rigid.gravityScale = 1.8f;
 			poly.isTrigger = false;
-			gun.allowedToShoot = true;
+			playerCtrl.allowedToShoot = true;
 			playerCtrl.isBeam = false;
 			anim.SetTrigger("IdleBeam");
 		}

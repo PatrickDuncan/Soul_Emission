@@ -9,6 +9,7 @@ public class PlayerControl : MonoBehaviour {
 	public bool isBeam = false;				// If the player is using the beam.
 	public bool isNormal = true;			// If the player's layer mask is not Ghost;
 	public bool allowedToBeam = true;		// If the player can use the beam.
+	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	public float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
@@ -33,13 +34,15 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void Update () {
+		if (Functions.GetPath(anim) == 485325471 && Functions.GetPath(anim) == -1268868314) { 
+			allowedToGhost = false;
+			allowedToShoot = false;
+		}
 	    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
 			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
-	    	if (Functions.GetPath(anim) != 485325471 && Functions.GetPath(anim) != -1268868314) { 
-	    		if (rigid.gravityScale > 0f) {
-		    		allowedToGhost = false;
-		    		Ghost(); 
-		    	}
+    		if (rigid.gravityScale > 0f) {
+	    		allowedToGhost = false;
+	    		Ghost(); 
 	    	}
 	    }
 	    // Stops glitch where the player would get stuck above the enemy after ghost mode.
