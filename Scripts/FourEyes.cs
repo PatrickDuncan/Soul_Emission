@@ -58,7 +58,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private void OnCollisionStay2D (Collision2D col) {
 		if (allowedToAttack && col.gameObject.tag.Equals("Player")) {
 			allowedToAttack = false;
-			playerH.TakeDamage(1.8f, false, false);
+			playerH.TakeDamage(2f, false, false);
 			StartCoroutine(WaitToAttack());
 		}
 	}
@@ -90,21 +90,24 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	}
 
 	public void TakeDamage (float damage) {
-		health -= damage;
-		// When it dies disable all unneeded game objects and switch to death animation/sprite
-		if (health <= 0f)
-			StartCoroutine(Death());		
-		else
-			anim.SetTrigger("Hurt");
+		if (health > 0) {
+			health -= damage;
+			// When it dies disable all unneeded game objects and switch to death animation/sprite
+			if (health <= 0f)
+				StartCoroutine(Death());
+			else
+				anim.SetTrigger("Hurt");
+		}
 	}
 
 	public IEnumerator Death () {
 		custom.PlayClipAt(deathClip, theTransform.position);
 		anim.SetTrigger("Death");
 		yield return new WaitForSeconds(0.4f);
-		Destroy(rigid);
+		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
+		// This should happen in the animation, but if the game lags...
 		GetComponent<SpriteRenderer>().sprite = deathSprite;
-		GetComponent<PolygonCollider2D>().enabled = false;
 		GetComponent<Animator>().enabled = false;
 		enabled = false;
 	}

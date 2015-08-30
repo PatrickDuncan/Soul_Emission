@@ -9,7 +9,7 @@ public class PointyLegs : MonoBehaviour {
 	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 1.4f;	// The fastest the player can travel in the x axis.
-	public float health = 40f;				// The health points for this instance of the pointy legs prefab.
+	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
 	private float maxVal;					// Maximum value used in the DeltaMax function.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip swingClip;				// Clip for when pointy legs attacks.
@@ -86,22 +86,25 @@ public class PointyLegs : MonoBehaviour {
 		theTransform.localScale = theScale;
 	}
 
-	public void TakeDamage (float damageAmount) {
-		health -= damageAmount;
-		// When it dies disable all unneeded game objects and switch to death animation/sprite
-		if (health <= 0f)
-			StartCoroutine(Death());
-		else
-			anim.SetTrigger("Hurt");
+	public void TakeDamage (float damage) {
+		if (health > 0) {
+			health -= damage;
+			// When it dies disable all unneeded game objects and switch to death animation/sprite
+			if (health <= 0f)
+				StartCoroutine(Death());
+			else
+				anim.SetTrigger("Hurt");
+		}
 	}
 
 	public IEnumerator Death () {
 		custom.PlayClipAt(deathClip, theTransform.position);
 		anim.SetTrigger("Death");
-		yield return new WaitForSeconds(0.40f);    	
-		Destroy(rigid);
+		yield return new WaitForSeconds(0.40f);    
+		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
+		// This should happen in the animation, but if the game lags...
 		GetComponent<SpriteRenderer>().sprite = deathSprite;
-		GetComponent<PolygonCollider2D>().enabled = false;
 		GetComponent<Animator>().enabled = false;
 		enabled = false;
 	}

@@ -31,7 +31,7 @@ public class AmmoPickUp : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 5f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
+		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
 			// Parent object has a sprite, so GetComponetInChildren doesn't work
 			// Get all the components in the children and used the 1 element, which is the actual child.
 			SpriteRenderer[] gO = gameObject.GetComponentsInChildren<SpriteRenderer>();

@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Lift : MonoBehaviour {		
 
+	private static bool found;						// If beam 1 has been found, for efficiency.
+
 	private Transform theTransform;			// Reference to the Transform.
 	private Rigidbody2D rigid;				// Reference to the player's rigid body.
 	private PolygonCollider2D poly;			// Reference to the player's polygon collider.
@@ -23,6 +25,10 @@ public class Lift : MonoBehaviour {
 		player = gO.transform;
 		anim = GetComponent<Animator>();
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
+		if (!found && gameObject.name.Equals("beam 1")) {
+			found = true;
+			anim.SetTrigger("HelpBeam");
+		}
 	}
 
 	public void OnMouseDown () {

@@ -78,9 +78,13 @@ public class PlayerHealth : MonoBehaviour {
 	}
 
 	public void AddHealth () {
-		if (currentH < HEALTH) {	// Can't overheal
-			reset.helmetLight.intensity += 0.4f;
+		if (currentH < HEALTH-10f) { // Can't overheal
 			currentH += 10f;
+			reset.helmetLight.intensity += 0.4f;
+		}
+		else {
+			currentH = HEALTH;
+			reset.helmetLight.intensity = 4f;
 		}
 	}
 

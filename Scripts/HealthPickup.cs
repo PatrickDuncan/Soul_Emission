@@ -29,7 +29,7 @@ public class HealthPickup : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 5f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
+		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
 			if (GetComponent<SpriteRenderer>().sprite != usedSprite) { 
 				GetComponent<SpriteRenderer>().sprite = usedSprite;
 				custom.PlayClipAt(activateClip, theTransform.position);

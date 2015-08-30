@@ -2,8 +2,11 @@
 
 public class Bullet : MonoBehaviour {
 
+	private Gun gun;						// Reference to the GUn class in Player.
+
 	private void Start () {
-		Destroy(gameObject, 0.7f);		// Automatically destroy the bullet in 1 second.
+		gun = GameObject.FindWithTag("Player").GetComponentInChildren<Gun>();
+		Destroy(gameObject, 0.8f);			// Automatically destroy the bulletType in 1 second.
 	}
 	
 	private void OnTriggerEnter2D (Collider2D col) {
@@ -14,12 +17,13 @@ public class Bullet : MonoBehaviour {
 		else if (!gO.GetComponent<PolygonCollider2D>().isTrigger) {
 			if (col.gameObject.tag.Equals("Enemy"))
 				Destroy(gameObject);		
+			float dmg = gun.dmgAmounts[gun.bulletType];
 			if (name.Contains("Pointy Legs"))
-				gO.GetComponent<PointyLegs>().TakeDamage(7f);
+				gO.GetComponent<PointyLegs>().TakeDamage(dmg);
 			else if (name.Contains("Four Eyes") && gO.GetComponent<FourEyes>().allowedToDestroy)
-				gO.GetComponent<FourEyes>().TakeDamage(7f);
+				gO.GetComponent<FourEyes>().TakeDamage(dmg);
 			else if (name.Contains("Explodetaur"))
-				gO.GetComponent<Explodetaur>().TakeDamage(7f);
+				gO.GetComponent<Explodetaur>().TakeDamage(dmg);
 		}
 	}
 }

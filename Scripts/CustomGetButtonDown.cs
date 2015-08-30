@@ -7,7 +7,7 @@ public class CustomGetButtonDown : MonoBehaviour {
 	// Once you press down the correct key it will set a bool true and that bool
 	// will only be set false when you release the key.
 
-	private static bool shot;						// If you just shot the gun.
+	private static bool shot;					// If you just shot the gun.
 
 	public static bool ButtonDown () {
 		if (Input.GetButtonDown("Shoot"))

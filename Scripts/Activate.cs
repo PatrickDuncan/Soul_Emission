@@ -12,9 +12,9 @@ public class Activate : MonoBehaviour {
 
 	private void Start () {
 		theTransform = transform;
-		accessLight = GetComponent<Light>();
+		accessLight = GetComponentInChildren<Light>();
 		//char i = transform.tag[transform.tag.Length-1];
-		doorLight = GameObject.FindWithTag("Door").GetComponent<Light>();
+		doorLight = GameObject.FindWithTag("Door").GetComponentInChildren<Light>();
 		player = GameObject.FindWithTag("Player").transform;
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
@@ -28,7 +28,7 @@ public class Activate : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 5f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) { 
+		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) { 
 			accessLight.enabled = !accessLight.enabled;
 		 	doorLight.enabled = !doorLight.enabled;
 			custom.PlayClipAt(activateClip, theTransform.position);

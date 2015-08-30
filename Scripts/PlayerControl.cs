@@ -21,6 +21,7 @@ public class PlayerControl : MonoBehaviour {
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component
 	private Lift lift;						// Reference to the Lift script.
 	private Reset reset;					// Reference to the Reset script.
+	private HelpfulTips tips;				// Reference to the HelpfulTips script.
 
 	private void Awake () {
 		theTransform = transform;
@@ -29,6 +30,7 @@ public class PlayerControl : MonoBehaviour {
 		rigid = GetComponent<Rigidbody2D>();
 		reset = GameObject.FindWithTag("Scripts").GetComponent<Reset>();
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		tips = GameObject.FindWithTag("Tips").GetComponent<HelpfulTips>();
 		if (!isRight)
 			reset.ResetHelmet();
 	}
@@ -48,8 +50,26 @@ public class PlayerControl : MonoBehaviour {
 	    // Stops glitch where the player would get stuck above the enemy after ghost mode.
 	    if (!isGhost && !isNormal && EnemiesFarAway()) {
 	    	isNormal = true;
-	    	gameObject.layer = LayerMask.NameToLayer("Default");
+	    	gameObject.layer = LayerMask.NameToLayer("Player");
 	    }
+	    // Helpful tips
+	    if (Application.loadedLevel == 1) {
+	    	Vector3 pos = theTransform.position;
+			if (pos.x > -18f && pos.x < 0f && pos.y < -6.5f)
+				tips.Show(0);
+			else if (pos.x > 21f && pos.x < 37f && pos.y < -6.5f)
+				tips.Show(1);
+			else if (pos.x > 16f && pos.y > 6.9f)
+				tips.Show(2);
+			else if (pos.x < -25f && pos.y > -0.5f && pos.y < 1f)
+				tips.Show(3);
+			else
+				tips.Show(-1);
+		} else if (Application.loadedLevel == 6) {
+			Vector3 pos = theTransform.position;
+			if (pos.x > 6f && pos.x < 18f && pos.y < -6.5f && pos.y > -7.5f)
+				tips.Show(0);
+		}
 	}
 
 	private void FixedUpdate ()	{
@@ -72,7 +92,7 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponent<Light>().enabled) {
+		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponentInChildren<Light>().enabled) {
 			// If right door move to next scene, if left move to previous
 			int level = Application.loadedLevel;
 			//***Load Level***//
@@ -171,6 +191,6 @@ public class PlayerControl : MonoBehaviour {
 	private IEnumerator StuckOnHead () {
     	gameObject.layer = LayerMask.NameToLayer("Ghost");
     	yield return new WaitForSeconds(2f);
-    	gameObject.layer = LayerMask.NameToLayer("Default");
+    	gameObject.layer = LayerMask.NameToLayer("Player");
 	}
 }

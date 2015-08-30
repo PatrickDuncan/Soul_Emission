@@ -91,11 +91,11 @@ public class Explodetaur : MonoBehaviour, IEnemy {
     	yield return new WaitForSeconds(0.35f);
     	if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 3.05f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
     		playerH.TakeDamage(20f, true, isRight);
-    	// This should happen in the animation, but if the game lags...
-    	GetComponent<SpriteRenderer>().sprite = deathSprite;
     	GetComponentInChildren<Light>().enabled = false;
-		Destroy(rigid);
-		GetComponent<PolygonCollider2D>().enabled = false;
+		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
+		// This should happen in the animation, but if the game lags...
+		GetComponent<SpriteRenderer>().sprite = deathSprite;
 		GetComponent<Animator>().enabled = false;
 		enabled = false;
     }
