@@ -14,7 +14,7 @@ public class Activate : MonoBehaviour {
 		theTransform = transform;
 		accessLight = GetComponentInChildren<Light>();
 		//char i = transform.tag[transform.tag.Length-1];
-		doorLight = GameObject.FindWithTag("Door").GetComponentInChildren<Light>();
+		doorLight = GameObject.FindWithTag("Exit").GetComponentInChildren<Light>();
 		player = GameObject.FindWithTag("Player").transform;
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}

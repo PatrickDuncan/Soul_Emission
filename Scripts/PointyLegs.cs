@@ -8,7 +8,7 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
 	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1.4f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 1.5f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
 	private float maxVal;					// Maximum value used in the DeltaMax function.
 	private Vector2 playerPos;				// The player's position.
@@ -75,7 +75,7 @@ public class PointyLegs : MonoBehaviour {
 		if (sign * rigid.velocity.x < MAXSPEED)
 			rigid.AddForce(Vector2.right * sign * MOVEFORCE);
 		if (Mathf.Abs(rigid.velocity.x) > MAXSPEED)
-			// ... set the player's velocity to the MAXSPEED in the x axis.
+			// Set the player's velocity to the MAXSPEED in the x axis.
 			rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * MAXSPEED, rigid.velocity.y);
 	}
 
@@ -89,6 +89,8 @@ public class PointyLegs : MonoBehaviour {
 	public void TakeDamage (float damage) {
 		if (health > 0) {
 			health -= damage;
+			StopCoroutine(WaitToAttack());
+			StopCoroutine(PlayerHurt());
 			// When it dies disable all unneeded game objects and switch to death animation/sprite
 			if (health <= 0f)
 				StartCoroutine(Death());
@@ -101,14 +103,17 @@ public class PointyLegs : MonoBehaviour {
 		custom.PlayClipAt(deathClip, theTransform.position);
 		anim.SetTrigger("Death");
 		yield return new WaitForSeconds(0.40f);    
-		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		DeathState();
+	}
+	
+	public void DeathState () {
+    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
 		// This should happen in the animation, but if the game lags...
 		GetComponent<SpriteRenderer>().sprite = deathSprite;
 		GetComponent<Animator>().enabled = false;
-		enabled = false;
-	}
-
+		enabled = false;	
+    }
 	// Wait to attack again.
 	private IEnumerator WaitToAttack () {
         yield return new WaitForSeconds(2.9f);
@@ -118,7 +123,7 @@ public class PointyLegs : MonoBehaviour {
     // Allows you to dodge the attack
     private IEnumerator PlayerHurt () {
     	yield return new WaitForSeconds(0.32f);
-    	if (Functions.DeltaMax(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+    	if (health > 0 && Functions.DeltaMax(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
     		playerH.TakeDamage(10f, true, isRight);
     }
 }

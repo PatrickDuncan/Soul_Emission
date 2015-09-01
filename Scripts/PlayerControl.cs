@@ -10,8 +10,9 @@ public class PlayerControl : MonoBehaviour {
 	public bool isNormal = true;			// If the player's layer mask is not Ghost;
 	public bool allowedToBeam = true;		// If the player can use the beam.
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
+	private bool comingBack;				// If the player is back tracking.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	public float maxSpeed = 1.5f;			// The fastest the player can travel in the x axis.
+	public float maxSpeed = 1.6f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	private GameObject[] enemies;			// List of all the enemy tagged game objects.
 
@@ -22,6 +23,8 @@ public class PlayerControl : MonoBehaviour {
 	private Lift lift;						// Reference to the Lift script.
 	private Reset reset;					// Reference to the Reset script.
 	private HelpfulTips tips;				// Reference to the HelpfulTips script.
+	private ShowPanels showPanels;			// Reference to ShowPanels script on UI GameObject, to show and hide panels
+	private Scenes scenes;					// Reference to the Scenes script.
 
 	private void Awake () {
 		theTransform = transform;
@@ -30,50 +33,41 @@ public class PlayerControl : MonoBehaviour {
 		rigid = GetComponent<Rigidbody2D>();
 		reset = GameObject.FindWithTag("Scripts").GetComponent<Reset>();
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
-		tips = GameObject.FindWithTag("Tips").GetComponent<HelpfulTips>();
+		tips = GameObject.FindWithTag("UI").GetComponent<HelpfulTips>();
+		showPanels = GameObject.FindWithTag("UI").GetComponent<ShowPanels>();
+		scenes = GameObject.FindWithTag("Scripts").GetComponent<Scenes>();
 		if (!isRight)
 			reset.ResetHelmet();
+		rigid.gravityScale = 0f;
+		GetComponentInChildren<SpriteRenderer>().enabled = false;
 	}
 
 	private void Update () {
-		if (Functions.GetPath(anim) == 485325471 && Functions.GetPath(anim) == -1268868314) { 
-			allowedToGhost = false;
-			allowedToShoot = false;
-		}
-	    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
-			// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
-    		if (rigid.gravityScale > 0f) {
-	    		allowedToGhost = false;
-	    		Ghost(); 
-	    	}
-	    }
-	    // Stops glitch where the player would get stuck above the enemy after ghost mode.
-	    if (!isGhost && !isNormal && EnemiesFarAway()) {
-	    	isNormal = true;
-	    	gameObject.layer = LayerMask.NameToLayer("Player");
-	    }
-	    // Helpful tips
-	    if (Application.loadedLevel == 1) {
-	    	Vector3 pos = theTransform.position;
-			if (pos.x > -18f && pos.x < 0f && pos.y < -6.5f)
-				tips.Show(0);
-			else if (pos.x > 21f && pos.x < 37f && pos.y < -6.5f)
-				tips.Show(1);
-			else if (pos.x > 16f && pos.y > 6.9f)
-				tips.Show(2);
-			else if (pos.x < -25f && pos.y > -0.5f && pos.y < 1f)
-				tips.Show(3);
-			else
-				tips.Show(-1);
-		} else if (Application.loadedLevel == 6) {
-			Vector3 pos = theTransform.position;
-			if (pos.x > 6f && pos.x < 18f && pos.y < -6.5f && pos.y > -7.5f)
-				tips.Show(0);
+		if (Application.loadedLevel != 0) {
+			if (Functions.GetPath(anim) == 485325471 && Functions.GetPath(anim) == -1268868314) { 
+				allowedToGhost = false;
+				allowedToShoot = false;
+			}
+		    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
+				// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
+	    		if (rigid.gravityScale > 0f) {
+		    		allowedToGhost = false;
+		    		Ghost(); 
+		    	}
+		    }
+		    if (Input.GetButtonDown("Submit"))
+		    	Application.LoadLevel(Application.loadedLevel + 1);
+		    // Stops glitch where the player would get stuck above the enemy after ghost mode.
+		    if (!isGhost && !isNormal && EnemiesFarAway()) {
+		    	isNormal = true;
+		    	gameObject.layer = LayerMask.NameToLayer("Player");
+		    }
+		    HelpfulTips();
 		}
 	}
 
 	private void FixedUpdate ()	{
-		if (!playerH.isDead) {
+		if (!playerH.isDead && Application.loadedLevel != 0) {
 			float h = Input.GetAxis("Horizontal");
 			Physics(h);
 			// Touch Input
@@ -87,16 +81,30 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnLevelWasLoaded (int level) {
+		if (level == 1) {
+			rigid.gravityScale = 0.9f;
+			GetComponentInChildren<SpriteRenderer>().enabled = true;
+		}
 		// Resets the enemies array on level load.
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
+		if (comingBack)
+			scenes.Load(enemies);
+		else
+			reset.ResetPosition();
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
-		if (col.gameObject.tag.Equals("Door") && col.gameObject.GetComponentInChildren<Light>().enabled) {
-			// If right door move to next scene, if left move to previous
-			int level = Application.loadedLevel;
+		if (col.gameObject.tag.Equals("Enter") && col.gameObject.GetComponentInChildren<Light>().enabled) {	
 			//***Load Level***//
-			Application.LoadLevel(level + 1); 
+			Application.LoadLevel(Application.loadedLevel - 1);
+			showPanels.ToggleLoading(true);
+			comingBack = true;
+		}
+		else if (col.gameObject.tag.Equals("Exit") && col.gameObject.GetComponentInChildren<Light>().enabled) {	
+			scenes.Save(enemies);
+			//***Load Level***//
+			Application.LoadLevel(Application.loadedLevel + 1);
+			showPanels.ToggleLoading(true);
 		}
 	}
 	
@@ -153,7 +161,7 @@ public class PlayerControl : MonoBehaviour {
 		previousIntensity = reset.helmetLight.intensity;
 		reset.helmetLight.intensity = 6f;
 		GetComponent<AudioSource>().pitch = 3f;
-		maxSpeed = 3f;
+		maxSpeed = 3.1f;
 		rigid.velocity = new Vector2(rigid.velocity.x, 0);		// Alllows you to stop in the mid air.
 		StartCoroutine(GhostTime());
 	}
@@ -163,8 +171,29 @@ public class PlayerControl : MonoBehaviour {
 		reset.ResetHelmet();
 	}
 
+	private void HelpfulTips () {
+	    if (Application.loadedLevel == 1) {
+	    	Vector3 pos = theTransform.position;
+	    	// There is only one enemy active enemy in scene 1
+			if (Functions.DeltaMax(pos.x, GameObject.FindWithTag("Enemy").transform.position.x, 14f) && pos.y < -6.5f)
+				tips.Show(0);
+			else if (pos.x > 21f && pos.x < 37f && pos.y < -6.5f)
+				tips.Show(1);
+			else if (pos.x > 16f && pos.y > 6.9f)
+				tips.Show(2);
+			else if (pos.x < -25f && pos.y > -0.5f && pos.y < 1f)
+				tips.Show(3);
+			else
+				tips.Show(-1);
+		} else if (Application.loadedLevel == 6) {
+			Vector3 pos = theTransform.position;
+			if (pos.x > 6f && pos.x < 18f && pos.y < -6.5f && pos.y > -7.5f)
+				tips.Show(0);
+		}
+	}
+
 	private IEnumerator GhostTime () {
-    	yield return new WaitForSeconds(3.5f);
+    	yield return new WaitForSeconds(3.4f);
     	if (!playerH.isDead) {
 	    	if (isRight)
 				anim.SetTrigger("IdleRight");
@@ -180,7 +209,7 @@ public class PlayerControl : MonoBehaviour {
     	GetComponent<AudioSource>().pitch = 0.4f;
     	reset.helmetLight.intensity = previousIntensity;
 		isGhost = false;
-		maxSpeed = 1.5f;
+		maxSpeed = 1.6f;
 	}
 
 	private IEnumerator WaitForGhost () {

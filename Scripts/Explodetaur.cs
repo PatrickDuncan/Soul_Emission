@@ -7,7 +7,7 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	public bool isRight;					// For determining which way the explodetaur is currently facing.	
 	private bool isDead;					// If the explodetaur is dead.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 3f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 3.1f;	// The fastest the player can travel in the x axis.
 	public float health = 14f;				// The health points for this instance of the explodetaur prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when explodetaur meets its end.
@@ -92,11 +92,15 @@ public class Explodetaur : MonoBehaviour, IEnemy {
     	if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 3.05f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
     		playerH.TakeDamage(20f, true, isRight);
     	GetComponentInChildren<Light>().enabled = false;
-		GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		DeathState();
+    }
+
+    public void DeathState () {
+    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
 		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
 		// This should happen in the animation, but if the game lags...
 		GetComponent<SpriteRenderer>().sprite = deathSprite;
 		GetComponent<Animator>().enabled = false;
-		enabled = false;
+		enabled = false;	
     }
 }

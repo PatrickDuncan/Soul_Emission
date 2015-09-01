@@ -6,6 +6,7 @@ public class HealthPickup : MonoBehaviour {
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 	public Sprite usedSprite;				// Sprite for when the health is used.
 	public AudioClip activateClip;			// Clip for when the player shoots.
+	public bool used;						// If the health pick-up has been used.
 
 	private Transform theTransform;			// Reference to the Transform.
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script.
@@ -28,9 +29,10 @@ public class HealthPickup : MonoBehaviour {
 		Enable();
 	}
 
-	private void Enable () {
+	public void Enable () {
 		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
-			if (GetComponent<SpriteRenderer>().sprite != usedSprite) { 
+			if (!used) { 
+				used = true;
 				GetComponent<SpriteRenderer>().sprite = usedSprite;
 				custom.PlayClipAt(activateClip, theTransform.position);
 				playerH.AddHealth();

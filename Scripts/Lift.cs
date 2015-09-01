@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Lift : MonoBehaviour {		
 
-	private static bool found;						// If beam 1 has been found, for efficiency.
+	private static bool found;				// If beam 1 has been found, for efficiency.
 
 	private Transform theTransform;			// Reference to the Transform.
 	private Rigidbody2D rigid;				// Reference to the player's rigid body.
@@ -70,7 +70,7 @@ public class Lift : MonoBehaviour {
 	}	
 	
 	private IEnumerator WaitForBeam () {
-		yield return new WaitForSeconds(4.5f);
+		yield return new WaitForSeconds(4.15f);
 		playerCtrl.allowedToBeam = true;
 	}	
 }

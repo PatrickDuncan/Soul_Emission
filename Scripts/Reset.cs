@@ -13,6 +13,7 @@ public class Reset : MonoBehaviour {
 	private GameObject player;				// Reference to the player's game object.
 	public AudioClip kissClip;				// Normal background song.
 	public AudioClip expanseClip;			// Secondary background song.
+	public AudioClip driftingClip;				// Normal background song.
 	public Quaternion defaultLight;			// Default position of the helmet light
 
 
@@ -23,6 +24,7 @@ public class Reset : MonoBehaviour {
 		anim = player.GetComponent<Animator>();
 		positions = GameObject.FindWithTag("Scripts").GetComponent<Positions>();
 		defaultLight = Quaternion.Euler(16f, 106f, 220f);
+        player.GetComponent<AudioSource>().pitch = 1f;
 	}
 
 	private void Start () {
@@ -30,12 +32,15 @@ public class Reset : MonoBehaviour {
 	}
 	
 	private void OnLevelWasLoaded (int level) {
-        ResetPosition();
         AudioSource audio = player.GetComponent<AudioSource>();
-        if (level == 4)
-        	audio.clip = expanseClip;
-        else
+        if (level%2 == 1) {
         	audio.clip = kissClip;
+        	audio.pitch = 0.4f;
+        }
+        else if (level%2 == 0) {
+        	audio.clip = expanseClip;
+        	audio.pitch = 0.4f;
+        }
         audio.Play();
     }
 
@@ -59,15 +64,25 @@ public class Reset : MonoBehaviour {
 			    		break;
 			    }
 		    }
-		  //  j = positions.fourEyesStart;
+		//  j = positions.fourEyesStart;
 		    j = 0;
-		    for (int i=0; i<positions.fourEyes.Length; i++) {
+		    for (int i=0; i<enemies.Length; i++) {
 		    	if (enemies[i].name.Contains("Four Eyes")) {
 			    	enemies[i].transform.position = positions.fourEyes[j];
 			    	if (enemies[i].GetComponent<FourEyes>().health > 0f)
-			    		enemies[i].GetComponent<FourEyes>().health = 45f;
+			    		enemies[i].GetComponent<FourEyes>().health = 100f;
 			    	j++;
 			    	if (j == positions.fourEyes.Length)
+			    		break;
+			    }
+		    }
+		    for (int i=0; i<enemies.Length; i++) {
+		    	if (enemies[i].name.Contains("Explodetaur")) {
+			    	enemies[i].transform.position = positions.explodetaur[j];
+			    	if (enemies[i].GetComponent<Explodetaur>().health > 0f)
+			    		enemies[i].GetComponent<Explodetaur>().health = 14f;
+			    	j++;
+			    	if (j == positions.explodetaur.Length)
 			    		break;
 			    }
 		    }

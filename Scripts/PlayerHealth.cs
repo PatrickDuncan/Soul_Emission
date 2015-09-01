@@ -90,7 +90,7 @@ public class PlayerHealth : MonoBehaviour {
 
 	private IEnumerator Push () {
 		yield return new WaitForSeconds(0.15f);
-		playerCtrl.maxSpeed = 1.5f;
+		playerCtrl.maxSpeed = 1.6f;
 	}
 
 	private IEnumerator Revive () {

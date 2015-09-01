@@ -15,15 +15,19 @@ public class Bullet : MonoBehaviour {
 		if (name.Equals("Background") || name.Contains("Access") || name.Contains("Door") || name.Contains("floor"))
 			Destroy(gameObject);
 		else if (!gO.GetComponent<PolygonCollider2D>().isTrigger) {
-			if (col.gameObject.tag.Equals("Enemy"))
-				Destroy(gameObject);		
 			float dmg = gun.dmgAmounts[gun.bulletType];
-			if (name.Contains("Pointy Legs"))
+			if (name.Contains("Pointy Legs") && gO.GetComponent<PointyLegs>().health > 0f) {
 				gO.GetComponent<PointyLegs>().TakeDamage(dmg);
-			else if (name.Contains("Four Eyes") && gO.GetComponent<FourEyes>().allowedToDestroy)
+				Destroy(gameObject);
+			}
+			else if (name.Contains("Four Eyes") && gO.GetComponent<FourEyes>().health > 0f && gO.GetComponent<FourEyes>().allowedToDestroy) {
 				gO.GetComponent<FourEyes>().TakeDamage(dmg);
-			else if (name.Contains("Explodetaur"))
+				Destroy(gameObject);
+			}
+			else if (name.Contains("Explodetaur") && gO.GetComponent<Explodetaur>().health > 0f) {
 				gO.GetComponent<Explodetaur>().TakeDamage(dmg);
+				Destroy(gameObject);
+			}
 		}
 	}
 }

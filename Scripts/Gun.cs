@@ -32,36 +32,38 @@ public class Gun : MonoBehaviour {
 	}
 
 	private void Update () {
-		if (playerCtrl.allowedToShoot && !playerCtrl.isGhost && CustomGetButtonDown.ButtonDown() || TouchShoot()) {
-			playerCtrl.allowedToShoot = false;
-			if (playerCtrl.isRight)
-				anim.SetTrigger("RightShoot");
-			else
-				anim.SetTrigger("LeftShoot");
-			// Derive the bullet's position from the player's position.
-			Rigidbody2D bulletR;
-			if (bulletType == 0) { 
-				bulletR = bullet0;
-				custom.PlayClipAt(SMGClip, theTransform.position);
+		if (Application.loadedLevel != 0) {
+			if (playerCtrl.allowedToShoot && !playerCtrl.isGhost && CustomGetButtonDown.ButtonDown() || TouchShoot()) {
+				playerCtrl.allowedToShoot = false;
+				if (playerCtrl.isRight)
+					anim.SetTrigger("RightShoot");
+				else
+					anim.SetTrigger("LeftShoot");
+				// Derive the bullet's position from the player's position.
+				Rigidbody2D bulletR;
+				if (bulletType == 0) { 
+					bulletR = bullet0;
+					custom.PlayClipAt(SMGClip, theTransform.position);
+				}
+				else if (bulletType == 1) {
+					bulletR = bullet1;
+					custom.PlayClipAt(pistolClip, theTransform.position);
+				} else
+					bulletR = bullet2;
+				if (playerCtrl.isRight) {
+					position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);
+					Rigidbody2D bulletInstance = Instantiate(bulletR, position, Quaternion.Euler(new Vector3(0, 0, 0))) as Rigidbody2D;
+					bulletInstance.velocity = new Vector2(SPEED, 0);
+				}
+				else {
+					position = new Vector3(player.position.x - SHIFTX, player.position.y + SHIFTY, 0);
+					Rigidbody2D bulletInstance = Instantiate(bulletR, position, Quaternion.Euler(new Vector3(0, 0, 180f))) as Rigidbody2D;
+					bulletInstance.velocity = new Vector2(-SPEED, 0);
+				}
+				StartCoroutine(Wait());
 			}
-			else if (bulletType == 1) {
-				bulletR = bullet1;
-				custom.PlayClipAt(pistolClip, theTransform.position);
-			} else
-				bulletR = bullet2;
-			if (playerCtrl.isRight) {
-				position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);
-				Rigidbody2D bulletInstance = Instantiate(bulletR, position, Quaternion.Euler(new Vector3(0, 0, 0))) as Rigidbody2D;
-				bulletInstance.velocity = new Vector2(SPEED, 0);
-			}
-			else {
-				position = new Vector3(player.position.x - SHIFTX, player.position.y + SHIFTY, 0);
-				Rigidbody2D bulletInstance = Instantiate(bulletR, position, Quaternion.Euler(new Vector3(0, 0, 180f))) as Rigidbody2D;
-				bulletInstance.velocity = new Vector2(-SPEED, 0);
-			}
-			StartCoroutine(Wait());
+			CustomGetButtonDown.ButtonUp();
 		}
-		CustomGetButtonDown.ButtonUp();
 	}
 
 	private bool TouchShoot () {

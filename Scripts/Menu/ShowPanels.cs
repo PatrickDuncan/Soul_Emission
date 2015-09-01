@@ -16,6 +16,7 @@ public class ShowPanels : MonoBehaviour {
 	public GameObject PC2;					// Reference to the Game Object PC2.
 	public GameObject Mobile1;				// Reference to the Game Object Mobile1.
 	public GameObject Mobile2;				// Reference to the Game Object Mobile2.
+	public GameObject Loading;				// Reference to the Game Object Loading.
 	public GameObject[] panels; 			// Array of the panels initialized above.
 
 	private void Awake () {
@@ -32,6 +33,14 @@ public class ShowPanels : MonoBehaviour {
 				}
 			}	
 		} 
+	}
+
+	private void OnLevelWasLoaded () {
+		ToggleLoading(false);
+	}
+
+	public void ToggleLoading (bool loading) {
+		Loading.SetActive(loading);
 	}
 
 	public void Show (GameObject panel) {
