@@ -70,7 +70,7 @@ public class Lift : MonoBehaviour {
 	}	
 	
 	private IEnumerator WaitForBeam () {
-		yield return new WaitForSeconds(4.15f);
+		yield return new WaitForSeconds(4.1f);
 		playerCtrl.allowedToBeam = true;
 	}	
 }

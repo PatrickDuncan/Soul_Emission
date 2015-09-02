@@ -12,7 +12,8 @@ public class PlayerControl : MonoBehaviour {
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	private bool comingBack;				// If the player is back tracking.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	public float maxSpeed = 1.6f;			// The fastest the player can travel in the x axis.
+	[HideInInspector] 
+	public float maxSpeed = 1.725f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	private GameObject[] enemies;			// List of all the enemy tagged game objects.
 
@@ -161,7 +162,7 @@ public class PlayerControl : MonoBehaviour {
 		previousIntensity = reset.helmetLight.intensity;
 		reset.helmetLight.intensity = 6f;
 		GetComponent<AudioSource>().pitch = 3f;
-		maxSpeed = 3.1f;
+		maxSpeed = 3.45f;
 		rigid.velocity = new Vector2(rigid.velocity.x, 0);		// Alllows you to stop in the mid air.
 		StartCoroutine(GhostTime());
 	}
@@ -192,8 +193,16 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	public void BackToNormal () {
+		rigid.gravityScale = 1.8f;
+    	GetComponent<AudioSource>().pitch = 0.4f;
+    	reset.helmetLight.intensity = previousIntensity;
+		isGhost = false;
+		maxSpeed = 1.725f;
+	}
+
 	private IEnumerator GhostTime () {
-    	yield return new WaitForSeconds(3.4f);
+    	yield return new WaitForSeconds(3f);
     	if (!playerH.isDead) {
 	    	if (isRight)
 				anim.SetTrigger("IdleRight");
@@ -202,14 +211,6 @@ public class PlayerControl : MonoBehaviour {
 			BackToNormal();
 			StartCoroutine(WaitForGhost());
 		}
-	}
-
-	public void BackToNormal () {
-		rigid.gravityScale = 1.8f;
-    	GetComponent<AudioSource>().pitch = 0.4f;
-    	reset.helmetLight.intensity = previousIntensity;
-		isGhost = false;
-		maxSpeed = 1.6f;
 	}
 
 	private IEnumerator WaitForGhost () {

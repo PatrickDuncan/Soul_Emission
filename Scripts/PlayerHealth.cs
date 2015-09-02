@@ -44,11 +44,11 @@ public class PlayerHealth : MonoBehaviour {
 			Die();
 		else if (!playerCtrl.isGhost && !isDead) {
 			currentH -= damage;
-			playerCtrl.maxSpeed = Mathf.Pow(damage, 2)/50;
+			playerCtrl.maxSpeed = Mathf.Pow(damage, 2)/60;
 			if (push && right)
-				GetComponent<Rigidbody2D>().AddForce(new Vector2(damage*5, 0), ForceMode2D.Impulse);
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(damage*4.5f, 0), ForceMode2D.Impulse);
 			else if (push && !right)
-				GetComponent<Rigidbody2D>().AddForce(new Vector2(-damage*5, 0), ForceMode2D.Impulse);
+				GetComponent<Rigidbody2D>().AddForce(new Vector2(-damage*4.5f, 0), ForceMode2D.Impulse);
 			StartCoroutine(Push());
 			if (currentH <= 0f) {
 				Die();
@@ -90,7 +90,7 @@ public class PlayerHealth : MonoBehaviour {
 
 	private IEnumerator Push () {
 		yield return new WaitForSeconds(0.15f);
-		playerCtrl.maxSpeed = 1.6f;
+		playerCtrl.maxSpeed = 1.725f;
 	}
 
 	private IEnumerator Revive () {

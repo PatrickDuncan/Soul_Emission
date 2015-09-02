@@ -8,7 +8,7 @@ public class PointyLegs : MonoBehaviour {
 	private bool allowedToAttack = true;	// If pointy legs is allowed to attack.
 	public bool attacking;					// If pointy legs is currently swinging its arms to attack.
 	private readonly float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1.5f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 1.61f;	// The fastest the player can travel in the x axis.
 	public float health = 45f;				// The health points for this instance of the pointy legs prefab.
 	private float maxVal;					// Maximum value used in the DeltaMax function.
 	private Vector2 playerPos;				// The player's position.
@@ -80,10 +80,12 @@ public class PointyLegs : MonoBehaviour {
 	}
 
 	private void Flip () {
-		isRight = !isRight;
-		Vector3 theScale = theTransform.localScale;
-		theScale.x *= -1;
-		theTransform.localScale = theScale;
+		if (!playerH.isDead) {
+			isRight = !isRight;
+			Vector3 theScale = theTransform.localScale;
+			theScale.x *= -1;
+			theTransform.localScale = theScale;
+		}
 	}
 
 	public void TakeDamage (float damage) {

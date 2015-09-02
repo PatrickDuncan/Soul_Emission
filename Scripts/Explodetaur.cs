@@ -7,7 +7,7 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	public bool isRight;					// For determining which way the explodetaur is currently facing.	
 	private bool isDead;					// If the explodetaur is dead.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 3.1f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 3.45f;	// The fastest the player can travel in the x axis.
 	public float health = 14f;				// The health points for this instance of the explodetaur prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when explodetaur meets its end.
@@ -34,11 +34,11 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 		playerPos = new Vector2(player.transform.position.x, player.transform.position.y);
 		if ((playerPos.x > theTransform.position.x && !isRight) || (playerPos.x < theTransform.position.x && isRight))
 			Flip();
-		if (!isDead && !playerH.isDead && Functions.DeltaMax(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
+		if (!isDead && !playerH.isDead && SelfExplodeContions()) {
 			isDead = true;
 			StartCoroutine(Death());		
 		}
-		else if (!playerH.isDead && Functions.DeltaMin(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f)) {
+		else if (!playerH.isDead && MoveConditions()) {
 			anim.SetTrigger("Walk");
 			Move();
 		}
@@ -50,6 +50,20 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	public void OnTriggerEnter2D (Collider2D col) {
 		if (col.gameObject.tag.Equals("Fire"))
 			TakeDamage(1000f);		// Instantly die if you touch fire
+	}
+
+	private bool SelfExplodeContions () {
+		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+			return true;
+		return false;
+	}
+
+	private bool MoveConditions () {
+		// Putting it in one if statement is too long.
+		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 30f) && Functions.DeltaMin(playerPos.x, theTransform.position.x, 2.9f))
+			if (Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+				return true;
+		return false;
 	}
 
 	private void Move () {
@@ -67,10 +81,12 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 	}
 
 	private void Flip () {
-		isRight = !isRight;
-		Vector3 theScale = theTransform.localScale;
-		theScale.x *= -1;
-		theTransform.localScale = theScale;
+		if (!playerH.isDead) {
+			isRight = !isRight;
+			Vector3 theScale = theTransform.localScale;
+			theScale.x *= -1;
+			theTransform.localScale = theScale;
+		}
 	}
 
 	public void TakeDamage (float damage) {

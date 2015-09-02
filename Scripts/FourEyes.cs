@@ -10,7 +10,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
 	public bool allowedToDestroy;			// If the bullet can be destroyed when collided.
 	private readonly float MOVEFORCE = 500f;	// Amount of force added to move the player left and right.
-	private readonly float MAXSPEED = 1f;	// The fastest the player can travel in the x axis.
+	private readonly float MAXSPEED = 1.035f;	// The fastest the player can travel in the x axis.
 	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
 	public AudioClip deathClip;				// CLip for when four eyes meets its end.
@@ -83,10 +83,12 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	}
 
 	private void Flip () {
-		isRight = !isRight;
-		Vector3 theScale = theTransform.localScale;
-		theScale.x *= -1;
-		theTransform.localScale = theScale;
+		if (!playerH.isDead) {
+			isRight = !isRight;
+			Vector3 theScale = theTransform.localScale;
+			theScale.x *= -1;
+			theTransform.localScale = theScale;
+		}
 	}
 
 	public void TakeDamage (float damage) {

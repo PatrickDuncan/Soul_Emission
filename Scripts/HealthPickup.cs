@@ -33,10 +33,14 @@ public class HealthPickup : MonoBehaviour {
 		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
 			if (!used) { 
 				used = true;
-				GetComponent<SpriteRenderer>().sprite = usedSprite;
+				SpriteChange();
 				custom.PlayClipAt(activateClip, theTransform.position);
 				playerH.AddHealth();
 			}	
 		}
 	}		
+
+	public void SpriteChange () {
+		GetComponent<SpriteRenderer>().sprite = usedSprite;
+	}
 }

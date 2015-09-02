@@ -5,6 +5,8 @@ using System.Collections;
 public class ShowPanels : MonoBehaviour {
 
 	public bool fromPause;					// Whether you got to a panel from the pause menu.
+	public AudioClip pressClip;				// When the player presses a menu item.
+	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	public GameObject controlsPanel;		// Reference to the Game Object ControlsPanel. 
 	public GameObject optionsPanel;			// Reference to the Game Object OptionsPanel.
@@ -21,6 +23,7 @@ public class ShowPanels : MonoBehaviour {
 
 	private void Awake () {
 		panels = new GameObject[] {PC1, PC2, Mobile1, Mobile2, controlsPanel, optionsPanel, creditsPanel};
+		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 
 	private void Update () {
@@ -51,6 +54,7 @@ public class ShowPanels : MonoBehaviour {
 			Hide(pausePanel);
 		} else 
 			fromPause = false;
+		custom.PlayClipAt(pressClip, transform.position);
 	}
 
 	public void Hide (GameObject panel) {
@@ -61,6 +65,7 @@ public class ShowPanels : MonoBehaviour {
 			if (!fromPause)
 				Tint.SetActive(false);
 		}
+		custom.PlayClipAt(pressClip, transform.position);
 	}
 
 	public void Switch (GameObject panel) {

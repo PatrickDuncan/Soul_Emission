@@ -9,6 +9,7 @@ public class Activate : MonoBehaviour {
 
 	private Transform theTransform;			// Reference to the Transform.
 	public AudioClip activateClip;			// Clip for when the player shoots.
+	private GameObject beam;				// A beam that allows the level to be back trackable.
 
 	private void Start () {
 		theTransform = transform;
@@ -19,6 +20,17 @@ public class Activate : MonoBehaviour {
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 	}
 	
+	private void OnLevelWasLoaded (int level) {
+		if (level == 5) {
+			foreach (GameObject gO in GameObject.FindGameObjectsWithTag("Beam")) {
+				if (gO.name.Equals("beam 7")) {
+					beam = gO;
+					beam.SetActive(false);
+				}
+			}
+		}
+	}
+
 	private void OnMouseDown () {
 		Enable();
 	}
@@ -28,10 +40,13 @@ public class Activate : MonoBehaviour {
 	}
 
 	private void Enable () {
-		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) { 
+		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2.75f)) { 
 			accessLight.enabled = !accessLight.enabled;
 		 	doorLight.enabled = !doorLight.enabled;
 			custom.PlayClipAt(activateClip, theTransform.position);
+			if (Application.loadedLevel == 5) {
+				beam.SetActive(!beam.activeSelf);
+			}
 		}
 	}		
 }

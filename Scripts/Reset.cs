@@ -51,39 +51,67 @@ public class Reset : MonoBehaviour {
 	    	helmetLight.intensity = 3f;
 	    	ResetPosition();
 	    	ResetHelmet();
-	    	// Loop through all the pointy legs in the scene and reset their positions.
-	    	int j = 0;
+	    	// Loop through all the enemies in the scene and reset their positions.
+
+		// 	int j = 0;
+	 //    	GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+	 //    	for (int i=0; i<enemies.Length; i++) {
+		//     	if (enemies[i].name.Contains("Pointy Legs")) {
+			    	
+		// 	    	if (enemies[i].GetComponent<PointyLegs>().health > 0f) {
+		// 	    		enemies[i].transform.position = positions.pointy[j];
+		// 	    		enemies[i].GetComponent<PointyLegs>().health = 45f;
+		// 	    	}
+		// 	    	j++;
+		// 	    	if (j == positions.pointy.Length)
+		// 	    		break;
+		// 	    }
+		//     }
+		// //  j = positions.fourEyesStart;
+		//     j = 0;
+		//     for (int i=0; i<enemies.Length; i++) {
+		//     	if (enemies[i].name.Contains("Four Eyes")) {
+			    	
+		// 	    	if (enemies[i].GetComponent<FourEyes>().health > 0f) {
+		// 	    		print(positions.fourEyes[j]);
+		// 	    		enemies[i].transform.position = positions.fourEyes[j];
+		// 	    		enemies[i].GetComponent<FourEyes>().health = 100f;
+		// 	    	}
+		// 	    	j++;
+		// 	    	if (j == positions.fourEyes.Length)
+		// 	    		break;
+		// 	    }
+		//     }
+		//     j = 0;
+		//     for (int i=0; i<enemies.Length; i++) {
+		//     	if (enemies[i].name.Contains("Explodetaur")) {
+			    	
+		// 	    	if (enemies[i].GetComponent<Explodetaur>().health > 0f) {
+		// 	    		enemies[i].transform.position = positions.explodetaur[j];
+		// 	    		enemies[i].GetComponent<Explodetaur>().health = 14f;
+		// 	    	}
+		// 	    	j++;
+		// 	    	if (j == positions.explodetaur.Length)
+		// 	    		break;
+		// 	    }
+		//     }
+
 	    	GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
-	    	for (int i=0; i<enemies.Length; i++) {
+		    int pointyIndex = 0, explodetaurIndex = 0;
+		    for (int i=0; i<enemies.Length; i++) {
 		    	if (enemies[i].name.Contains("Pointy Legs")) {
-			    	enemies[i].transform.position = positions.pointy[j];
-			    	if (enemies[i].GetComponent<PointyLegs>().health > 0f)
+			    	if (enemies[i].GetComponent<PointyLegs>().health > 0f) {
+			    		enemies[i].transform.position = positions.pointy[pointyIndex];
 			    		enemies[i].GetComponent<PointyLegs>().health = 45f;
-			    	j++;
-			    	if (j == positions.pointy.Length)
-			    		break;
+			    	}
+			    	pointyIndex++;
 			    }
-		    }
-		//  j = positions.fourEyesStart;
-		    j = 0;
-		    for (int i=0; i<enemies.Length; i++) {
-		    	if (enemies[i].name.Contains("Four Eyes")) {
-			    	enemies[i].transform.position = positions.fourEyes[j];
-			    	if (enemies[i].GetComponent<FourEyes>().health > 0f)
-			    		enemies[i].GetComponent<FourEyes>().health = 100f;
-			    	j++;
-			    	if (j == positions.fourEyes.Length)
-			    		break;
-			    }
-		    }
-		    for (int i=0; i<enemies.Length; i++) {
-		    	if (enemies[i].name.Contains("Explodetaur")) {
-			    	enemies[i].transform.position = positions.explodetaur[j];
-			    	if (enemies[i].GetComponent<Explodetaur>().health > 0f)
+			    else if (enemies[i].name.Contains("Explodetaur")) {
+			    	if (enemies[i].GetComponent<Explodetaur>().health > 0f) {
+			    		enemies[i].transform.position = positions.explodetaur[explodetaurIndex];
 			    		enemies[i].GetComponent<Explodetaur>().health = 14f;
-			    	j++;
-			    	if (j == positions.explodetaur.Length)
-			    		break;
+			    	}
+			    	explodetaurIndex++;
 			    }
 		    }
 		} catch (Exception e) {

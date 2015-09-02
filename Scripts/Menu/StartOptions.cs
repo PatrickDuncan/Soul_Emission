@@ -15,7 +15,7 @@ public class StartOptions : MonoBehaviour {
 	}
 
 	public void StartButtonClicked () {
-		if (inMainMenu) {
+		if (inMainMenu) {		// Stops player from press Start multiple times and creating clones of all the gameobjects
 			inMainMenu = false;
 			GetComponent<Animator>().SetTrigger("Fade");
 			Invoke("MoveOn", 1f);		

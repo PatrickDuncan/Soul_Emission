@@ -36,7 +36,7 @@ public class Scenes : MonoBehaviour {
 	}
 
 	public void Save (GameObject[] enemies) {
-	//	usedHealths[level] = GameObject.FindWithTag("Health").GetComponent<HealthPickup>().used;
+		usedHealths[level] = GameObject.FindWithTag("Health").GetComponent<HealthPickup>().used;
 		playerPos[level] = GameObject.FindWithTag("Player").transform.position;
 		int j = pointyStart[level];
 		for (int i=0; i<enemies.Length; i++) {
@@ -89,9 +89,9 @@ public class Scenes : MonoBehaviour {
 	}
 
 	public void Load (GameObject[] enemies)	{
-		// if (usedHealths[level]) {
-		// 	GameObject.FindWithTag("Health").GetComponent<HealthPickup>().Enable();
-		// }
+		if (usedHealths[level]) {
+			GameObject.FindWithTag("Health").GetComponent<HealthPickup>().SpriteChange();
+		}
 		GameObject.FindWithTag("Player").transform.position = playerPos[level];
 		int j = pointyStart[level];
 		for (int i=0; i<enemies.Length; i++) {
