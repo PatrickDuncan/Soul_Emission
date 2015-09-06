@@ -7,15 +7,16 @@ public class HelpfulTips : MonoBehaviour {
 	public GameObject Help3;				// Help tip game object
 	public GameObject Help4;				// Help tip game object
 	public GameObject Help5;				// Help tip game object
+	public GameObject Help6;				// Help tip game object
 
 	public void Show (int index) {
-		GameObject[] tips = {Help1, Help2, Help3, Help4, Help5};
+		GameObject[] tips = {Help1, Help2, Help3, Help4, Help5, Help6};
 		if (index != -1)
 			tips[index].SetActive(true);
-		for (int i=0; i<5; i++) {
-			if (i != index) {
+		// Loop through all the help objects and set the ones not being used to false.
+		for (int i=0; i<tips.Length; i++) {
+			if (i != index)
 				tips[i].SetActive(false);	
-			}
 		}
 	}
 }

@@ -10,11 +10,11 @@ public class ToCamera : MonoBehaviour {
 		camera = GameObject.FindWithTag("MainCamera").transform;
 	}
 
-	private void OnLevelWasLoaded(int level) {
-        camera = GameObject.FindWithTag("MainCamera").transform;	// Brings object to the camera when level is loaded.
-    }
-
 	private void Update () {
 		theTransform.position = new Vector3(camera.position.x, camera.position.y, 0f);
 	}
+	
+	private void OnLevelWasLoaded(int level) {
+        camera = GameObject.FindWithTag("MainCamera").transform;	// Brings object to the camera when level is loaded.
+    }
 }

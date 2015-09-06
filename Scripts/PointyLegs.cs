@@ -64,6 +64,25 @@ public class PointyLegs : MonoBehaviour {
 		if (col.gameObject.tag.Equals("Fire"))
 			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
+	
+	public void DeathState () {
+		health = 0;
+    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
+		// This should happen in the animation, but if the game lags...
+		GetComponent<SpriteRenderer>().sprite = deathSprite;
+		GetComponent<Animator>().enabled = false;
+		enabled = false;	
+    }
+
+	private void Flip () {
+		if (!playerH.isDead) {
+			isRight = !isRight;
+			Vector3 theScale = theTransform.localScale;
+			theScale.x *= -1;
+			theTransform.localScale = theScale;
+		}
+	}
 
 	private void Move () {
 		float sign;
@@ -77,15 +96,6 @@ public class PointyLegs : MonoBehaviour {
 		if (Mathf.Abs(rigid.velocity.x) > MAXSPEED)
 			// Set the player's velocity to the MAXSPEED in the x axis.
 			rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * MAXSPEED, rigid.velocity.y);
-	}
-
-	private void Flip () {
-		if (!playerH.isDead) {
-			isRight = !isRight;
-			Vector3 theScale = theTransform.localScale;
-			theScale.x *= -1;
-			theTransform.localScale = theScale;
-		}
 	}
 
 	public void TakeDamage (float damage) {
@@ -107,25 +117,17 @@ public class PointyLegs : MonoBehaviour {
 		yield return new WaitForSeconds(0.40f);    
 		DeathState();
 	}
-	
-	public void DeathState () {
-    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
-		// This should happen in the animation, but if the game lags...
-		GetComponent<SpriteRenderer>().sprite = deathSprite;
-		GetComponent<Animator>().enabled = false;
-		enabled = false;	
-    }
-	// Wait to attack again.
-	private IEnumerator WaitToAttack () {
-        yield return new WaitForSeconds(2.9f);
-        allowedToAttack = true;
-    }
 
     // Allows you to dodge the attack
     private IEnumerator PlayerHurt () {
     	yield return new WaitForSeconds(0.32f);
     	if (health > 0 && Functions.DeltaMax(playerPos.x, theTransform.position.x, maxVal) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
     		playerH.TakeDamage(10f, true, isRight);
+    }
+
+	// Wait to attack again.
+	private IEnumerator WaitToAttack () {
+        yield return new WaitForSeconds(2.9f);
+        allowedToAttack = true;
     }
 }

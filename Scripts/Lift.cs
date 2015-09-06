@@ -38,6 +38,16 @@ public class Lift : MonoBehaviour {
 	private void OnTouchStart () {
 		Beam();
 	}
+	
+	private void OnTriggerExit2D (Collider2D col) {
+		if (!playerCtrl.allowedToBeam) {
+			rigid.gravityScale = 1.8f;
+			poly.isTrigger = false;
+			playerCtrl.allowedToShoot = true;
+			playerCtrl.isBeam = false;
+			anim.SetTrigger("IdleBeam");
+		}
+	}	
 
 	private void Beam () {
 		if (GetComponent<PolygonCollider2D>().IsTouching(poly) && playerCtrl.allowedToBeam && !playerCtrl.isGhost && !playerH.isDead) {
@@ -59,15 +69,7 @@ public class Lift : MonoBehaviour {
 		}
 	}
 
-	private void OnTriggerExit2D (Collider2D col) {
-		if (!playerCtrl.allowedToBeam) {
-			rigid.gravityScale = 1.8f;
-			poly.isTrigger = false;
-			playerCtrl.allowedToShoot = true;
-			playerCtrl.isBeam = false;
-			anim.SetTrigger("IdleBeam");
-		}
-	}	
+	
 	
 	private IEnumerator WaitForBeam () {
 		yield return new WaitForSeconds(4.1f);

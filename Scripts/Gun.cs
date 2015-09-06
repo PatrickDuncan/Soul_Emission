@@ -11,13 +11,15 @@ public class Gun : MonoBehaviour {
 	public const float SHIFTY = 0.81f;   	// Constant y shift.
 	public int bulletType;					// Which bullet type to use.
 	public float[] waitTimes = {0.5f, 1f, 2f};		// The wait times for the various ammunitions.
-	public float[] dmgAmounts = {3f, 7f, 14f};		// The damage amounts for the various ammunitions.
+	public float[] dmgAmounts = {3f, 7f, 20f};	// The damage amounts for the various ammunitions.
 	private Vector3 position;				// For setting the position relative to the player.
 	
 	private Transform theTransform;			// Reference to the Transform.
 	public AudioClip SMGClip;				// Clip for when the player shoots with SMG.
 	public AudioClip pistolClip;			// Clip for when the player shoots with Pistol.
-	private PlayerControl playerCtrl;		// Reference to the PlayerControl script.
+	public AudioClip sniperClip;			// Clip for when the player shoots with Sniper.
+	private PlayerControl playerCtrl;		// Reference to the Player Control script.
+	private PlayerHealth playerH;			// Reference to the Player Health script.
 	private Animator anim;					// Reference to the Animator component.
 	private Transform player;				// Reference to the Transform component of Player.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
@@ -27,13 +29,14 @@ public class Gun : MonoBehaviour {
 		anim = transform.root.gameObject.GetComponent<Animator>();
 		player = GameObject.FindWithTag("Player").transform;
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
+		playerH = transform.root.GetComponent<PlayerHealth>();
 		custom = GameObject.FindWithTag("Scripts").GetComponent<CustomPlayClipAtPoint>();
 		bulletType = (int)bullets.Pistol;
 	}
 
 	private void Update () {
 		if (Application.loadedLevel != 0) {
-			if (playerCtrl.allowedToShoot && !playerCtrl.isGhost && CustomGetButtonDown.ButtonDown() || TouchShoot()) {
+			if (!playerH.isDead && playerCtrl.allowedToShoot && !playerCtrl.isGhost && CustomGetButtonDown.ButtonDown() || TouchShoot()) {
 				playerCtrl.allowedToShoot = false;
 				if (playerCtrl.isRight)
 					anim.SetTrigger("RightShoot");
@@ -48,7 +51,12 @@ public class Gun : MonoBehaviour {
 				else if (bulletType == 1) {
 					bulletR = bullet1;
 					custom.PlayClipAt(pistolClip, theTransform.position);
-				} else
+				}
+				 else if (bulletType == 2) {
+					bulletR = bullet2;
+					custom.PlayClipAt(sniperClip, theTransform.position);
+				} 
+				else
 					bulletR = bullet2;
 				if (playerCtrl.isRight) {
 					position = new Vector3(player.position.x + SHIFTX, player.position.y + SHIFTY, 0);

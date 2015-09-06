@@ -52,18 +52,22 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 			TakeDamage(1000f);		// Instantly die if you touch fire
 	}
 
-	private bool SelfExplodeContions () {
-		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
-			return true;
-		return false;
-	}
+	public void DeathState () {
+    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
+		// This should happen in the animation, but if the game lags...
+		GetComponent<SpriteRenderer>().sprite = deathSprite;
+		GetComponent<Animator>().enabled = false;
+		enabled = false;	
+    }
 
-	private bool MoveConditions () {
-		// Putting it in one if statement is too long.
-		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 30f) && Functions.DeltaMin(playerPos.x, theTransform.position.x, 2.9f))
-			if (Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
-				return true;
-		return false;
+	private void Flip () {
+		if (!playerH.isDead) {
+			isRight = !isRight;
+			Vector3 theScale = theTransform.localScale;
+			theScale.x *= -1;
+			theTransform.localScale = theScale;
+		}
 	}
 
 	private void Move () {
@@ -80,13 +84,18 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 			rigid.velocity = new Vector2(Mathf.Sign(rigid.velocity.x) * MAXSPEED, rigid.velocity.y);
 	}
 
-	private void Flip () {
-		if (!playerH.isDead) {
-			isRight = !isRight;
-			Vector3 theScale = theTransform.localScale;
-			theScale.x *= -1;
-			theTransform.localScale = theScale;
-		}
+	private bool MoveConditions () {
+		// Putting it in one if statement is too long.
+		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 30f) && Functions.DeltaMin(playerPos.x, theTransform.position.x, 2.9f))
+			if (Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+				return true;
+		return false;
+	}
+
+	private bool SelfExplodeContions () {
+		if (Functions.DeltaMax(playerPos.x, theTransform.position.x, 2.9f) && Functions.DeltaMax(playerPos.y, theTransform.position.y, 2f))
+			return true;
+		return false;
 	}
 
 	public void TakeDamage (float damage) {
@@ -102,6 +111,7 @@ public class Explodetaur : MonoBehaviour, IEnemy {
 
     public IEnumerator Death () {
     	// Do visual/audio death stuff then wait to explode and depower.
+    	health = 0;
     	custom.PlayClipAt(deathClip, theTransform.position);
 		anim.SetTrigger("Death");
     	yield return new WaitForSeconds(0.35f);
@@ -109,14 +119,5 @@ public class Explodetaur : MonoBehaviour, IEnemy {
     		playerH.TakeDamage(20f, true, isRight);
     	GetComponentInChildren<Light>().enabled = false;
 		DeathState();
-    }
-
-    public void DeathState () {
-    	GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
-		gameObject.layer = LayerMask.NameToLayer("Death");		// Death layer.
-		// This should happen in the animation, but if the game lags...
-		GetComponent<SpriteRenderer>().sprite = deathSprite;
-		GetComponent<Animator>().enabled = false;
-		enabled = false;	
-    }
+    }   
 }

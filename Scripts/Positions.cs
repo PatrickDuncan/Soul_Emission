@@ -21,6 +21,8 @@ public class Positions : MonoBehaviour {
 		pointyPos = asset.text;
 		asset = Resources.Load("fourEyesPos") as TextAsset;
 		fourEyesPos = asset.text;
+		asset = Resources.Load("explodePos") as TextAsset;
+		explodePos = asset.text;
 		GetPositions();
 	}
 
@@ -35,7 +37,7 @@ public class Positions : MonoBehaviour {
 		explodetaur = new Vector3[0];
 		pointy = Compute(pointy, pointyPos);
 		fourEyes = Compute(fourEyes, fourEyesPos);
-		explodetaur = Compute(fourEyes, fourEyesPos);
+		explodetaur = Compute(explodetaur, explodePos);
 	}
 
 	private Vector3 ComputePlayer () {

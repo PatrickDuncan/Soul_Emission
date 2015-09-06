@@ -10,12 +10,11 @@ public class AmmoPickUp : MonoBehaviour {
 
 	private Transform theTransform;			// Reference to the Transform.
 	private Reset reset;					// Reference to the Reset class.
-	private Gun gun;						// Rerference to the Gun class in Player.	
+	private Gun gun;						// Reference to the Gun class in Player.	
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
 	private void Start () {
 		theTransform = transform;
-		//char i = transform.tag[transform.tag.Length-1];
 		GameObject gO = GameObject.FindWithTag("Player");
 		player = gO.transform;
 		gun = gO.GetComponentInChildren<Gun>();
@@ -41,14 +40,15 @@ public class AmmoPickUp : MonoBehaviour {
 				custom.PlayClipAt(activateClip, theTransform.position);
 			}	
 			else if (gO[1].sprite == pistolSprite) { 
-				gO[1].sprite = SMGSprite;
+				gO[1].sprite = sniperSprite;
 				gun.bulletType = (int)Gun.bullets.Pistol;
 				custom.PlayClipAt(activateClip, theTransform.position);
 			}	
-			// if (GetComponent<SpriteRenderer>().sprite == sniperlSprite) { 
-			// 	GetComponentInChildren<SpriteRenderer>().sprite = usedSprite;
-				
-			// }	
+			else if (gO[1].sprite == sniperSprite) { 
+				gO[1].sprite = SMGSprite;
+				gun.bulletType = (int)Gun.bullets.Sniper;
+				custom.PlayClipAt(activateClip, theTransform.position);
+			}
 		}
 	}		
 }

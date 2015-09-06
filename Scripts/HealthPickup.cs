@@ -14,7 +14,6 @@ public class HealthPickup : MonoBehaviour {
 
 	private void Start () {
 		theTransform = transform;
-		//char i = transform.tag[transform.tag.Length-1];
 		GameObject gO = GameObject.FindWithTag("Player");
 		player = gO.transform;
 		playerH = gO.GetComponent<PlayerHealth>();
@@ -31,8 +30,7 @@ public class HealthPickup : MonoBehaviour {
 
 	public void Enable () {
 		if (Functions.DeltaMax(player.position.x, theTransform.position.x, 4f) && Functions.DeltaMax(player.position.y, theTransform.position.y, 2f)) {
-			if (!used) { 
-				used = true;
+			if (!used) {
 				SpriteChange();
 				custom.PlayClipAt(activateClip, theTransform.position);
 				playerH.AddHealth();
@@ -41,6 +39,7 @@ public class HealthPickup : MonoBehaviour {
 	}		
 
 	public void SpriteChange () {
+		used = true;
 		GetComponent<SpriteRenderer>().sprite = usedSprite;
 	}
 }

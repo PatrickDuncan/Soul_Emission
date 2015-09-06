@@ -2,7 +2,7 @@
 
 public class Bullet : MonoBehaviour {
 
-	private Gun gun;						// Reference to the GUn class in Player.
+	private Gun gun;						// Reference to the Gun class in Player.
 
 	private void Start () {
 		gun = GameObject.FindWithTag("Player").GetComponentInChildren<Gun>();
@@ -12,7 +12,7 @@ public class Bullet : MonoBehaviour {
 	private void OnTriggerEnter2D (Collider2D col) {
 		string name = col.gameObject.name;
 		GameObject gO = col.gameObject;
-		if (name.Equals("Background") || name.Contains("Access") || name.Contains("Door") || name.Contains("floor"))
+		if (name.Equals("Background") || name.Contains("Access") || name.Contains("Enter") || name.Contains("Exit") || name.Contains("floor"))
 			Destroy(gameObject);
 		else if (!gO.GetComponent<PolygonCollider2D>().isTrigger) {
 			float dmg = gun.dmgAmounts[gun.bulletType];

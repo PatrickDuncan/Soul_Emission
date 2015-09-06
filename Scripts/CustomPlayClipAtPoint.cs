@@ -18,7 +18,8 @@ public class CustomPlayClipAtPoint : MonoBehaviour {
 		    source.Play();
 		    Destroy(tempGO, clip.length);
 		    return source;
-	    } catch (Exception e) {
+	    } 
+	    catch (Exception e) {
 			print(e);
 			return null;
 		} 
