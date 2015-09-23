@@ -11,9 +11,10 @@ public class PlayerControl : MonoBehaviour {
 	public bool allowedToBeam = true;		// If the player can use the beam.
 	public bool allowedToShoot = true;		// Makes sure that the deltatime between the last shot is not too short.
 	public bool[] completed = new bool[7];	// The scenes the player has completed.
+	public bool[] visited = new bool[7];	// The scenes the player has visiteda.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	[HideInInspector] 
-	public float maxSpeed = 1.725f;			// The fastest the player can travel in the x axis.
+	public float maxSpeed = 2.07f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	private GameObject[] enemies;			// List of all the enemy tagged game objects.
 
@@ -22,6 +23,7 @@ public class PlayerControl : MonoBehaviour {
 	private PlayerHealth playerH;			// Reference to the PlayerHealth script
 	private Rigidbody2D rigid;				// Reference to the Rigidbody2D component
 	private Lift lift;						// Reference to the Lift script.
+	private Positions positions;			// Reference to the Positions script.
 	private Reset reset;					// Reference to the Reset script.
 	private HelpfulTips tips;				// Reference to the HelpfulTips script.
 	private ShowPanels showPanels;			// Reference to ShowPanels script on UI GameObject, to show and hide panels
@@ -32,6 +34,7 @@ public class PlayerControl : MonoBehaviour {
 		anim = GetComponent<Animator>();
 		playerH = GetComponent<PlayerHealth>();
 		rigid = GetComponent<Rigidbody2D>();
+		positions = GameObject.FindWithTag("Scripts").GetComponent<Positions>();
 		reset = GameObject.FindWithTag("Scripts").GetComponent<Reset>();
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
 		tips = GameObject.FindWithTag("UI").GetComponent<HelpfulTips>();
@@ -82,18 +85,20 @@ public class PlayerControl : MonoBehaviour {
 	}
 
 	private void OnLevelWasLoaded (int level) {
+		positions.GetPositions();
+		// Enemy is hidden in main menu, show it
 		if (level == 1) {
 			rigid.gravityScale = 0.9f;
 			GetComponentInChildren<SpriteRenderer>().enabled = true;
 		}
 		// Resets the enemies array on level load.
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
-		if (completed[level]) {
+		if (visited[level])
 			scenes.Load(enemies);
-		}
-		else {
+		else {	
 			reset.ResetPosition(false);
 		}
+		visited[level] = true;
 	}
 
 	private void OnCollisionEnter2D (Collision2D col) {
@@ -103,14 +108,15 @@ public class PlayerControl : MonoBehaviour {
 				//***Load Level***//
 				Application.LoadLevel(Application.loadedLevel - 1);
 				showPanels.ToggleLoading(true);
+				scenes.Save(enemies);	 // Save the current state of the scene you're leaving.
 			}
 			else if (col.gameObject.tag.Equals("Exit") && col.gameObject.GetComponentInChildren<Light>().enabled) {
 				//***Load Level***//
 				Application.LoadLevel(Application.loadedLevel + 1);
 				completed[Application.loadedLevel] = true;
 				showPanels.ToggleLoading(true);
-			}
-			scenes.Save(enemies);		// Save the current state of the scene you're leaving.
+				scenes.Save(enemies);
+			}					
 		}
 	}
 	
@@ -118,8 +124,10 @@ public class PlayerControl : MonoBehaviour {
 		// Stuck on head fix.
 		if (col.gameObject.tag.Equals("Enemy")) {
 			//Layer 0 is "Default"
-		    if (gameObject.layer == 0 && theTransform.position.y > col.gameObject.transform.position.y)
-		    	StartCoroutine(StuckOnHead());
+		    if (gameObject.layer == LayerMask.NameToLayer("Player") && theTransform.position.y > col.gameObject.transform.position.y) {
+		    	gameObject.layer = LayerMask.NameToLayer("Ghost");
+		    	isNormal = false;
+		    }
 		}
 	}
 
@@ -138,11 +146,11 @@ public class PlayerControl : MonoBehaviour {
 			enemyPos = enemy.transform.position;
 			if (!isRight && enemy.name.Equals("Pointy Legs")) {
 				// Return false if any one enemy is too close.
-				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 2.2f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 2f))
+				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 2.2f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 5f))
 					return false;
 			} 
 			else {
-				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 3.6f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 2f))
+				if (Functions.DeltaMax(enemyPos.x, theTransform.position.x, 3.6f) && Functions.DeltaMax(enemyPos.y, theTransform.position.y, 5f))
 					return false;
 			}
 		}
@@ -229,11 +237,5 @@ public class PlayerControl : MonoBehaviour {
 	private IEnumerator WaitForGhost () {
     	yield return new WaitForSeconds(10f);
     	allowedToGhost = true;
-	}
-
-	private IEnumerator StuckOnHead () {
-    	gameObject.layer = LayerMask.NameToLayer("Ghost");
-    	yield return new WaitForSeconds(2f);
-    	gameObject.layer = LayerMask.NameToLayer("Player");
 	}
 }

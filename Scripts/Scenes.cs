@@ -20,9 +20,9 @@ public class Scenes : MonoBehaviour {
 	private bool[] explodetaurAlive = new bool[5];				// Array of saved explodetaur mortality to load.
 	private bool[] usedHealths = new bool[6];					// Array of used healths to load.
 
-	private int[] pointyStart = {0,0, 1, 6, 12, 0};				// The start index in every scene for pointy legs.
-	private int[] fourEyesStart = {0, 0, 0, 0, 0, 3};				// The start index in every scene for four eyes.
-	private int[] explodetaurStart = {0, 0, 0, 0, 0, 0};			// The start index in every scene for explodetaur.
+	private int[] pointyStart = {0, 0, 1, 6, 12, 0};			// The start index in every scene for pointy legs.
+	private int[] fourEyesStart = {0, 0, 0, 0, 0, 3};			// The start index in every scene for four eyes.
+	private int[] explodetaurStart = {0, 0, 0, 0, 0, 0};		// The start index in every scene for explodetaur.
 	private int level;											// The current level/scene.
 
 	private PlayerControl playerCtrl;
@@ -109,31 +109,34 @@ public class Scenes : MonoBehaviour {
 	    	if (enemies[i].name.Contains("Pointy Legs")) {
 		    	enemies[i].transform.position = pointyPos[pointyIndex];
 		    	enemies[i].transform.rotation = pointyRot[pointyIndex];
-		    	enemies[i].transform.localScale = pointyFlip[pointyIndex];
 		    	if (pointyAlive[pointyIndex])
 		    		enemies[i].GetComponent<PointyLegs>().health = 45f;
-		    	else 
+		    	else {
 		    		enemies[i].GetComponent<PointyLegs>().DeathState();
+		    		enemies[i].transform.localScale = pointyFlip[pointyIndex];
+		    	}
 		    	pointyIndex++;
 		    }
 		    else if (enemies[i].name.Contains("Four Eyes")) {
 		    	enemies[i].transform.position = fourEyesPos[fourEyesIndex];
 		    	enemies[i].transform.rotation = fourEyesRot[fourEyesIndex];
-		    	enemies[i].transform.localScale = fourEyesFlip[fourEyesIndex];
 		    	if (fourEyesAlive[fourEyesIndex])
 		    		enemies[i].GetComponent<FourEyes>().health = 100f;
-		    	else
+		    	else {
 		    		enemies[i].GetComponent<FourEyes>().DeathState();
+		    		enemies[i].transform.localScale = fourEyesFlip[fourEyesIndex];
+		    	}
 		    	fourEyesIndex++;
 		    } 
 		    else if (enemies[i].name.Contains("Explodetaur")) {
 		    	enemies[i].transform.position = explodetaurPos[explodetaurIndex];
 		    	enemies[i].transform.rotation = explodetaurRot[explodetaurIndex];
-		    	enemies[i].transform.localScale = explodetaurFlip[explodetaurIndex];
 		    	if (explodetaurAlive[explodetaurIndex])
 		    		enemies[i].GetComponent<Explodetaur>().health = 14f;
-		    	else
+		    	else {
 		    		enemies[i].GetComponent<Explodetaur>().DeathState();
+		    		enemies[i].transform.localScale = explodetaurFlip[explodetaurIndex];
+		    	}
 		    	explodetaurIndex++;
 		    }
 	    }

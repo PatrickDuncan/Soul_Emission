@@ -14,7 +14,7 @@ public class Reset : MonoBehaviour {
 	public AudioClip kissClip;				// Normal background song.
 	public AudioClip expanseClip;			// Secondary background song.
 	public AudioClip driftingClip;			// Normal background song.
-	public Quaternion defaultLight;			// Default position of the helmet light
+	public Quaternion defaultLight;			// Default position of the helmet light.
 
 
 	private void Awake () {

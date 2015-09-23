@@ -26,11 +26,7 @@ public class Positions : MonoBehaviour {
 		GetPositions();
 	}
 
-	private void OnLevelWasLoaded () {
-		GetPositions();
-	}
-
-	private void GetPositions () {
+	public void GetPositions () {
 		player = ComputePlayer();
 		pointy = new Vector3[0];
 		fourEyes = new Vector3[0];

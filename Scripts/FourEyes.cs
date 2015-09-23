@@ -9,7 +9,7 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	public bool allowedToMove;				// For determining if the four eyes is allowed to move.	
 	private bool allowedToAttack = true;	// If four eyes is allowed to attack.
 	public bool allowedToDestroy;			// If the bullet can be destroyed when collided.
-	private readonly float MOVEFORCE = 700f;	// Amount of force added to move the player left and right.
+	private readonly float MOVEFORCE = 900f;	// Amount of force added to move the player left and right.
 	private readonly float MAXSPEED = 1.035f;	// The fastest the player can travel in the x axis.
 	public float health = 100f;				// The health points for this instance of the four eyes prefab.
 	private Vector2 playerPos;				// The player's position.
@@ -110,7 +110,6 @@ public class FourEyes : MonoBehaviour, IEnemy {
 	}
 
 	private void Move () {
-		print("made it");
 		float sign;
 		// If it is to the left or right of a hero.
 		if (playerPos.x > theTransform.position.x)
@@ -118,7 +117,6 @@ public class FourEyes : MonoBehaviour, IEnemy {
 		else
 			sign = -1f; 
 		if (sign * rigid.velocity.x < MAXSPEED) {
-			print("hmm");
 			rigid.AddForce(Vector2.right * sign * MOVEFORCE);
 		}
 		if (Mathf.Abs(rigid.velocity.x) > MAXSPEED)
