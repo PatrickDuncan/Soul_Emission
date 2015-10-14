@@ -10,8 +10,8 @@ public class Gun : MonoBehaviour {
 	public const float SHIFTX = 1.25f;   	// Constant x shift.
 	public const float SHIFTY = 0.81f;   	// Constant y shift.
 	public int bulletType;					// Which bullet type to use.
-	public float[] waitTimes = {0.5f, 1f, 2f};		// The wait times for the various ammunitions.
-	public float[] dmgAmounts = {3f, 7f, 20f};	// The damage amounts for the various ammunitions.
+	public float[] waitTimes = {0.43f, 0.8f, 1.7f};	// The wait times for the various ammunitions.
+	public float[] dmgAmounts = {3.5f, 7f, 20f};		// The damage amounts for the various ammunitions.
 	private Vector3 position;				// For setting the position relative to the player.
 	
 	private Transform theTransform;			// Reference to the Transform.

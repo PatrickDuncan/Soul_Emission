@@ -19,7 +19,7 @@ public class Pause : MonoBehaviour {
 		if (Input.GetButtonDown("Cancel") && !isPaused && !startScript.inMainMenu && !showPanels.fromPause) {
 			DoPause();
 		} 
-		else if (Input.GetButtonDown("Cancel") && isPaused && !startScript.inMainMenu && !showPanels.fromPause) {
+		else if (Input.GetButtonDown("Cancel") && isPaused && !startScript.inMainMenu && !showPanels.fromPause && !showPanels.controls) {
 			UnPause();
 		}
 	}

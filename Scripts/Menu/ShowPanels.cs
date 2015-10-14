@@ -5,6 +5,7 @@ using System.Collections;
 public class ShowPanels : MonoBehaviour {
 
 	public bool fromPause;					// Whether you got to a panel from the pause menu.
+	public bool controls;					// Controls unpause fix.
 	public AudioClip pressClip;				// When the player presses a menu item.
 	private CustomPlayClipAtPoint custom;	// Reference to the CustomPlayClipAtPoint script.
 
@@ -58,12 +59,20 @@ public class ShowPanels : MonoBehaviour {
 	}
 
 	public void Hide (GameObject panel) {
+
 		panel.SetActive(false);
-		if (fromPause && panel != pausePanel)
+		if (fromPause && panel != pausePanel) {
 			Show(pausePanel);
+			controls = false;
+		}
 		else if (panel != PC1 && panel != PC2 && panel != Mobile1 && panel != Mobile2) {
 			if (!fromPause)
 				Tint.SetActive(false);
+			controls = false;
+		}
+		else {
+			controls = true;
+			Hide(controlsPanel);
 		}
 		custom.PlayClipAt(pressClip, transform.position);
 	}

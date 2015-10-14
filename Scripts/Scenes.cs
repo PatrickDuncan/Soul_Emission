@@ -23,33 +23,28 @@ public class Scenes : MonoBehaviour {
 	private int[] pointyStart = {0, 0, 1, 6, 12, 0};			// The start index in every scene for pointy legs.
 	private int[] fourEyesStart = {0, 0, 0, 0, 0, 3};			// The start index in every scene for four eyes.
 	private int[] explodetaurStart = {0, 0, 0, 0, 0, 0};		// The start index in every scene for explodetaur.
-	private int level;											// The current level/scene.
+	private int Application.loadedLevel;											// The current Application.loadedLevel/scene.
 
 	private PlayerControl playerCtrl;
 
 	private void Awake () {
-		level = Application.loadedLevel;
 		playerCtrl = GameObject.FindWithTag("Player").GetComponent<PlayerControl>();
-	}
-
-	private void OnLevelWasLoaded (int level) {
-		this.level = level;
 	}
 
 	public void Save (GameObject[] enemies) {
 		try {
 			// Save used healths
-			usedHealths[level] = GameObject.FindWithTag("Health").GetComponent<HealthPickup>().used;
+			usedHealths[Application.loadedLevel] = GameObject.FindWithTag("Health").GetComponent<HealthPickup>().used;
 			Vector3 player = GameObject.FindWithTag("Player").transform.position; 
 			// Save the player's position with an offset so the player doesn't instantly collide with the door on load
 			if (player.x < 0)
-				playerPos[level] = player + new Vector3(1, 0, 0);
+				playerPos[Application.loadedLevel] = player + new Vector3(1, 0, 0);
 			else if (player.x > 0)
-				playerPos[level] = player - new Vector3(1, 0, 0);
+				playerPos[Application.loadedLevel] = player - new Vector3(1, 0, 0);
 			int pointyIndex, fourEyesIndex, explodetaurIndex;
-			pointyIndex = pointyStart[level];
-			fourEyesIndex = fourEyesStart[level];
-			explodetaurIndex = explodetaurStart[level];
+			pointyIndex = pointyStart[Application.loadedLevel];
+			fourEyesIndex = fourEyesStart[Application.loadedLevel];
+			explodetaurIndex = explodetaurStart[Application.loadedLevel];
 			// Loop through all the enemies in the scene and save their position, rotation and scale
 			// Record if they're dead as well.
 			for (int i=0; i<enemies.Length; i++) {
@@ -91,18 +86,20 @@ public class Scenes : MonoBehaviour {
 	}
 
 	public void Load (GameObject[] enemies)	{
-		// If the player has completed that level, turn on the door light they already  
+		// If the player has completed that Application.loadedLevel, turn on the door light they already  
 		// had to turn on early to advance 
-		if (playerCtrl.completed[level])
+		if (playerCtrl.completed[Application.loadedLevel])
 			GameObject.FindWithTag("Exit").GetComponentInChildren<Light>().enabled = true;
 		// Set used healths to the used state
-		if (usedHealths[level])
+		if (usedHealths[Application.loadedLevel])
 			GameObject.FindWithTag("Health").GetComponent<HealthPickup>().SpriteChange();
-		GameObject.FindWithTag("Player").transform.position = playerPos[level];
+		print(playerPos[Application.loadedLevel]);
+		print(Application.loadedLevel);
+		GameObject.FindWithTag("Player").transform.position = playerPos[Application.loadedLevel];
 		int pointyIndex, fourEyesIndex, explodetaurIndex;
-		pointyIndex = pointyStart[level];
-		fourEyesIndex = fourEyesStart[level];
-		explodetaurIndex = explodetaurStart[level];
+		pointyIndex = pointyStart[Application.loadedLevel];
+		fourEyesIndex = fourEyesStart[Application.loadedLevel];
+		explodetaurIndex = explodetaurStart[Application.loadedLevel];
 		// Loop through all the enemies in the scene and set their position, rotation and scale
 		// Set their health to maximum if they're alive or put them back to the death state.
 		for (int i=0; i<enemies.Length; i++) {

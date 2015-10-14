@@ -14,7 +14,7 @@ public class PlayerControl : MonoBehaviour {
 	public bool[] visited = new bool[7];	// The scenes the player has visiteda.
 	public const float MOVEFORCE = 365f;	// Amount of force added to move the player left and right.
 	[HideInInspector] 
-	public float maxSpeed = 2.07f;			// The fastest the player can travel in the x axis.
+	public float maxSpeed = 2.24f;			// The fastest the player can travel in the x axis.
 	public float previousIntensity = 5f;	// The light intensity before using ghost power.
 	private GameObject[] enemies;			// List of all the enemy tagged game objects.
 
@@ -59,8 +59,6 @@ public class PlayerControl : MonoBehaviour {
 		    		Ghost(); 
 		    	}
 		    }
-		    if (Input.GetButtonDown("Submit"))
-		    	Application.LoadLevel(Application.loadedLevel + 1);
 		    // Stops glitch where the player would get stuck above the enemy after ghost mode.
 		    if (!isGhost && !isNormal && EnemiesFarAway()) {
 		    	isNormal = true;
@@ -103,19 +101,21 @@ public class PlayerControl : MonoBehaviour {
 
 	private void OnCollisionEnter2D (Collision2D col) {
 		// Cannot go through a door if you're dead or an enemy is touching you.
+		int level = Application.loadedLevel;
 		if (!playerH.isDead && !GetComponent<PolygonCollider2D>().IsTouchingLayers(LayerMask.GetMask("Enemy"))) {
 			if (col.gameObject.tag.Equals("Enter") && col.gameObject.GetComponentInChildren<Light>().enabled) {	
 				//***Load Level***//
-				Application.LoadLevel(Application.loadedLevel - 1);
+				Application.LoadLevel(level - 1);
 				showPanels.ToggleLoading(true);
 				scenes.Save(enemies);	 // Save the current state of the scene you're leaving.
 			}
-			else if (col.gameObject.tag.Equals("Exit") && col.gameObject.GetComponentInChildren<Light>().enabled) {
+			else if (level != 4 && col.gameObject.tag.Equals("Exit") && col.gameObject.GetComponentInChildren<Light>().enabled) {
 				//***Load Level***//
-				Application.LoadLevel(Application.loadedLevel + 1);
-				completed[Application.loadedLevel] = true;
-				showPanels.ToggleLoading(true);
 				scenes.Save(enemies);
+				Application.LoadLevel(level + 1);
+				completed[level] = true;
+				showPanels.ToggleLoading(true);
+				
 			}					
 		}
 	}
@@ -124,7 +124,7 @@ public class PlayerControl : MonoBehaviour {
 		// Stuck on head fix.
 		if (col.gameObject.tag.Equals("Enemy")) {
 			//Layer 0 is "Default"
-		    if (gameObject.layer == LayerMask.NameToLayer("Player") && theTransform.position.y > col.gameObject.transform.position.y) {
+		    if (gameObject.layer == LayerMask.NameToLayer("Player") && Functions.DeltaMin(theTransform.position.y, col.gameObject.transform.position.y, 2f)) {
 		    	gameObject.layer = LayerMask.NameToLayer("Ghost");
 		    	isNormal = false;
 		    }
@@ -183,7 +183,8 @@ public class PlayerControl : MonoBehaviour {
 		Vector3 pos = theTransform.position;
 	    if (Application.loadedLevel == 1) {	    	
 	    	// There is only one enemy active enemy in scene 1
-			if (Functions.DeltaMax(pos.x, GameObject.FindWithTag("Enemy").transform.position.x, 14f) && pos.y < -6.5f)
+	    	GameObject gO = GameObject.FindWithTag("Enemy");
+			if (Functions.DeltaMax(pos.x, gO.transform.position.x, 14f) && pos.y < -6.5f && gO.GetComponent<PointyLegs>().health > 0f)
 				tips.Show(0);
 			else if (pos.x > 21f && pos.x < 37f && pos.y < -6.5f)
 				tips.Show(1);
@@ -203,6 +204,12 @@ public class PlayerControl : MonoBehaviour {
 		else if (Application.loadedLevel == 3) {
 			if (pos.x < -22.5f && pos.y < -6.5f && pos.y > -7.5f)
 				tips.Show(4);
+			else
+				tips.Show(-1);
+		}
+		else if (Application.loadedLevel == 4) {
+			if (rigid.IsTouching(GameObject.FindWithTag("Exit").GetComponent<PolygonCollider2D>()))
+				tips.Show(6);
 			else
 				tips.Show(-1);
 		}
