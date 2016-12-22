@@ -8,3 +8,5 @@ What I've attained from creating this project:
 - Improved OOP skills.
 - Learned how to effectively use APIs and it's documentation.
 - Exponentially improved my graphics capabilities with GIMP.
+
+Openable in Unity.

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6dfde545ecfd24e40962f6b63ca5dc7d
+timeCreated: 1440580076
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - SMGSprite: {fileID: 21300000, guid: 94dd1203a36b3e941b2574ecdd252665, type: 3}
+  - pistolSprite: {fileID: 21300000, guid: 7fe39d5b819f18e4d8f14d1674f9f6ef, type: 3}
+  - sniperlSprite: {instanceID: 0}
+  - activateClip: {fileID: 8300000, guid: 137635ef1edee6c4aa5e3347148a4d45, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
