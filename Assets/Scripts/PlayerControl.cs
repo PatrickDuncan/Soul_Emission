@@ -1,6 +1,9 @@
 using UnityEngine;
 using System.Collections;
 
+/**
+*This class controls the player's movement
+*/
 public class PlayerControl : MonoBehaviour {
 	
 	public bool isRight = true;				// For determining which way the player is currently facing.
@@ -29,6 +32,10 @@ public class PlayerControl : MonoBehaviour {
 	private ShowPanels showPanels;			// Reference to ShowPanels script on UI GameObject, to show and hide panels
 	private Scenes scenes;					// Reference to the Scenes script.
 
+
+	/**
+	Variables and game states are initialized before the game starts. 
+	*/
 	private void Awake () {
 		theTransform = transform;
 		anim = GetComponent<Animator>();
@@ -40,27 +47,32 @@ public class PlayerControl : MonoBehaviour {
 		tips = GameObject.FindWithTag("UI").GetComponent<HelpfulTips>();
 		showPanels = GameObject.FindWithTag("UI").GetComponent<ShowPanels>();
 		scenes = GameObject.FindWithTag("Scripts").GetComponent<Scenes>();
-		if (!isRight)
+		if (!isRight)//case analysis of the direction of the helmet
 			reset.ResetHelmet();
 		rigid.gravityScale = 0f;
 		GetComponentInChildren<SpriteRenderer>().enabled = false;
 	}
 
+	/**
+	Update is called every frame, if the MonoBehaviour is enabled to implement game behaviours.
+
+	*/
 	private void Update () {
 		if (Application.loadedLevel != 0) {
+			//case analysis on the path of the animation 
 			if (Functions.GetPath(anim) == 485325471 && Functions.GetPath(anim) == -1268868314) { 
 				allowedToGhost = false;
 				allowedToShoot = false;
 			}
-		    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {
+		    if (Input.GetButtonDown("Ghost") && allowedToGhost && allowedToBeam) {//case analysis on permission to ghost and beam
 				// Makes sure that the player is not in the shooting animation (left or right) or hovering before ghosting.
-	    		if (rigid.gravityScale > 0f) {
+	    		if (rigid.gravityScale > 0f) {//case analysis on the scale of the gravity 
 		    		allowedToGhost = false;
 		    		Ghost(); 
 		    	}
 		    }
 		    // Stops glitch where the player would get stuck above the enemy after ghost mode.
-		    if (!isGhost && !isNormal && EnemiesFarAway()) {
+		    if (!isGhost && !isNormal && EnemiesFarAway()) {//case analysis on the normality of the ghost and the position of the enemies to prevent the player getting stuck above enemy.
 		    	isNormal = true;
 		    	gameObject.layer = LayerMask.NameToLayer("Player");
 		    }
@@ -68,9 +80,13 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+
+	/**
+	Called every fixed framerate frame, if the MonoBehaviour is enabled.
+	*/
 	private void FixedUpdate ()	{
-		if (!playerH.isDead && Application.loadedLevel != 0) {
-			float h = Input.GetAxis("Horizontal");
+		if (!playerH.isDead && Application.loadedLevel != 0) {//case analysis on the status of the player and the level
+			float h = Input.GetAxis("Horizontal");//variable h gets the value of the Horizontal axis
 			Physics(h);
 			// Touch Input
 			if (Input.touchCount == 1 && Input.touches[0].position.x < Screen.width/2 && Input.touches[0].position.y < Screen.height/2) {
@@ -82,6 +98,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	/**
+	 *Checks the level that was loaded
+	 *@param {int} level - The current level
+	 */
 	private void OnLevelWasLoaded (int level) {
 		positions.GetPositions();
 		// Enemy is hidden in main menu, show it
@@ -91,7 +111,7 @@ public class PlayerControl : MonoBehaviour {
 		}
 		// Resets the enemies array on level load.
 		enemies = GameObject.FindGameObjectsWithTag("Enemy");
-		if (visited[level])
+		if (visited[level])// if a level has been visited
 			scenes.Load(enemies);
 		else {	
 			reset.ResetPosition(false);
@@ -99,11 +119,16 @@ public class PlayerControl : MonoBehaviour {
 		visited[level] = true;
 	}
 
+
+	/**
+	 *Activated when an incoming collider makes contact with this object's collider
+	 *@param {Collision2D} col - Collision2D data associated with this collision.
+	 */
 	private void OnCollisionEnter2D (Collision2D col) {
 		// Cannot go through a door if you're dead or an enemy is touching you.
 		int level = Application.loadedLevel;
-		if (!playerH.isDead && !GetComponent<PolygonCollider2D>().IsTouchingLayers(LayerMask.GetMask("Enemy"))) {
-			if (col.gameObject.tag.Equals("Enter") && col.gameObject.GetComponentInChildren<Light>().enabled) {	
+		if (!playerH.isDead && !GetComponent<PolygonCollider2D>().IsTouchingLayers(LayerMask.GetMask("Enemy"))) {//if player is dead or an enemy is touching them 
+			if (col.gameObject.tag.Equals("Enter") && col.gameObject.GetComponentInChildren<Light>().enabled) {	//cannot go through door
 				//***Load Level***//
 				Application.LoadLevel(level - 1);
 				showPanels.ToggleLoading(true);
@@ -120,6 +145,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 	
+	/**
+	*Sent each frame where a collider on another object is touching this object's collider
+	@param {Collision2D} col - Collision2D data associated with this collision.
+	*/
 	private void OnCollisionStay2D (Collision2D col) {
 		// Stuck on head fix.
 		if (col.gameObject.tag.Equals("Enemy")) {
@@ -131,6 +160,9 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	/**
+	*Checks if object's movement has gone back to normal
+	*/
 	public void BackToNormal () {
 		rigid.gravityScale = 1.8f;
     	GetComponent<AudioSource>().pitch = 0.4f;
@@ -139,6 +171,10 @@ public class PlayerControl : MonoBehaviour {
 		maxSpeed = 1.725f;
 	}
 
+	/**
+	*Checks if enemies are far away
+	@return bool
+	*/
 	private bool EnemiesFarAway () {
 		// Loops through all enemies to make sure that they're not colliding (by comparing the x values).
 		Vector3 enemyPos;
@@ -157,11 +193,18 @@ public class PlayerControl : MonoBehaviour {
 		return true;
 	}	
 
+	/**
+	Checks if helmet has been flipped
+	*/
 	private void Flip () {
 		isRight = !isRight;
 		reset.ResetHelmet();
 	}
 
+
+	/**
+	Modifies the behaviour of the ghost
+	*/
 	private void Ghost () {	
 		isGhost = true;
 		if (isRight)
@@ -179,6 +222,10 @@ public class PlayerControl : MonoBehaviour {
 		StartCoroutine(GhostTime());
 	} 
 
+
+	/**
+	Displays helpful tips to the user 
+	*/
 	private void HelpfulTips () {
 		Vector3 pos = theTransform.position;
 	    if (Application.loadedLevel == 1) {	    	
@@ -215,6 +262,11 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+
+	/**
+	Checks Physics properties of the user. Namely:
+	the player is not in the shooting animation, if the player is changing direction before moving.
+	*/
 	private void Physics (float h) {
 		// Makes sure that the player is not in the shooting animation (left or right) before moving
 		if (!isBeam && Functions.GetPath(anim) != 485325471 && Functions.GetPath(anim) != -1268868314) {
@@ -229,6 +281,9 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+	/**
+	Checks the status of the player and commands the ghost object to suit result
+	*/
 	private IEnumerator GhostTime () {
     	yield return new WaitForSeconds(2.8f);
     	if (!playerH.isDead) {
@@ -241,6 +296,10 @@ public class PlayerControl : MonoBehaviour {
 		}
 	}
 
+
+	/**
+	suspends the coroutine execution temporarily
+	*/
 	private IEnumerator WaitForGhost () {
     	yield return new WaitForSeconds(10f);
     	allowedToGhost = true;
